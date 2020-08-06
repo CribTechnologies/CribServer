@@ -37,7 +37,7 @@ public class SignUpRequest extends ControllerRequest {
     @NotBlank
     private String phoneNumber;
 
-    @NotEmpty
+    @NotNull
     private Gender gender;
 
     public String getFirstName() {

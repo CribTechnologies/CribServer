@@ -76,6 +76,24 @@ public abstract class FirestoreRepository<T extends DataTransferObject> implemen
         return response;
     }
 
+    // Reusable protected methods
+    public <T1> RepositoryResponse updateField(String id, String fieldName, T1 fieldValue) {
+        RepositoryResponse response = new RepositoryResponse();
+        try {
+            getCollectionRef()
+                    .document(id)
+                    .update(fieldName, fieldValue)
+                    .get();
+
+            response.setSuccessful(true);
+        }
+        catch (Exception e) {
+            response.setSuccessful(false);
+            response.setMessage(e.getMessage());
+        }
+        return response;
+    }
+
     // Inherited base methods
     @Override
     public RepositoryResponse create(T object) {
