@@ -3,7 +3,7 @@ package com.crib.server.common.patterns;
 public class DataTransferObject {
 
     private String id;
-    private int timestamp;
+    private long timestamp;
 
     public DataTransferObject() {
     }
@@ -16,11 +16,11 @@ public class DataTransferObject {
         this.id = id;
     }
 
-    public int getTimestamp() {
+    public long getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(int timestamp) {
+    public void setTimestamp(long timestamp) {
         this.timestamp = timestamp;
     }
 }

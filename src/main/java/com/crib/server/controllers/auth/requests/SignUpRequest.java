@@ -3,12 +3,7 @@ package com.crib.server.controllers.auth.requests;
 import com.crib.server.common.enums.Gender;
 import com.crib.server.common.patterns.ControllerRequest;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-import javax.validation.constraints.Past;
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.*;
 import java.util.Date;
 
 public class SignUpRequest extends ControllerRequest {

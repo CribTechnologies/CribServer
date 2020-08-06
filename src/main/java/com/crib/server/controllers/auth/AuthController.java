@@ -4,11 +4,7 @@ import com.crib.server.controllers.auth.requests.SignInRequest;
 import com.crib.server.controllers.auth.requests.SignUpRequest;
 import com.crib.server.controllers.auth.responses.SignInResponse;
 import com.crib.server.controllers.auth.responses.SignUpResponse;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")

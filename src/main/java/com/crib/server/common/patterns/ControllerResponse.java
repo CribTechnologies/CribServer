@@ -14,6 +14,16 @@ public class ControllerResponse {
         messages = new ArrayList<String>();
     }
 
+    public void addMessage(String message) {
+        messages.add(message);
+    }
+
+    public void addMessages(List<String> messages) {
+        for (String message : messages) {
+            addMessage(message);
+        }
+    }
+
     public ControllerResponseStatus getStatus() {
         return status;
     }
@@ -24,9 +34,5 @@ public class ControllerResponse {
 
     public List<String> getMessages() {
         return messages;
-    }
-
-    public void setMessages(List<String> messages) {
-        this.messages = messages;
     }
 }

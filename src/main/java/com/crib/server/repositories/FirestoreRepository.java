@@ -77,7 +77,7 @@ public abstract class FirestoreRepository<T extends DataTransferObject> implemen
     }
 
     // Reusable protected methods
-    public <T1> RepositoryResponse updateField(String id, String fieldName, T1 fieldValue) {
+    protected <T1> RepositoryResponse updateField(String id, String fieldName, T1 fieldValue) {
         RepositoryResponse response = new RepositoryResponse();
         try {
             getCollectionRef()

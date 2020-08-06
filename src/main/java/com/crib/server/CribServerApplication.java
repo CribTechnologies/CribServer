@@ -10,6 +10,9 @@ public class CribServerApplication {
 
 	public static void main(String[] args) throws IOException {
 		FirebaseSetup.getInstance().initialize();
+		Argon2Setup.getInstance().initialize();
+		JSONWebTokenSetup.getInstance().initialize();
+
 		SpringApplication.run(CribServerApplication.class, args);
 	}
 }
