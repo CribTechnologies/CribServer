@@ -1,4 +1,4 @@
-package com.crib.server.controllers.auth.requests;
+package com.crib.server.common.ctrl_requests;
 
 import com.crib.server.common.enums.Gender;
 import com.crib.server.common.patterns.CtrlRequest;
@@ -25,7 +25,7 @@ public class SignUpRequest extends CtrlRequest {
     private String email;
 
     @NotNull
-    @Size(min = 1, max = 1024)
+    @Size(min = 6, max = 1024)
     private String password;
 
     @NotNull

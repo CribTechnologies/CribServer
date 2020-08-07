@@ -1,13 +1,13 @@
 package com.crib.server.common.patterns;
 
-public class RepositoryResponseWithPayload<T> extends RepositoryResponse {
+public class RepoResponseWP<T> extends RepoResponse {
 
     private T payload;
 
-    public RepositoryResponseWithPayload() {
+    public RepoResponseWP() {
     }
 
-    public RepositoryResponseWithPayload(boolean successful, String message, T payload) {
+    public RepoResponseWP(boolean successful, String message, T payload) {
         super(successful, message);
         this.payload = payload;
     }

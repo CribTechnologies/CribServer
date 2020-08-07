@@ -1,4 +1,4 @@
-package com.crib.server.controllers.lock.requests;
+package com.crib.server.common.ctrl_requests;
 
 import com.crib.server.common.enums.LockType;
 import com.crib.server.common.patterns.CtrlRequest;

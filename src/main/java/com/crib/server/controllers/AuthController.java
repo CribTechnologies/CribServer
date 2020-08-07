@@ -1,10 +1,10 @@
-package com.crib.server.controllers.auth;
+package com.crib.server.controllers;
 
 import com.crib.server.common.patterns.CtrlResponseWP;
-import com.crib.server.controllers.auth.requests.SignInRequest;
-import com.crib.server.controllers.auth.requests.SignUpRequest;
-import com.crib.server.controllers.auth.responses.SignInResponse;
-import com.crib.server.controllers.auth.responses.SignUpResponse;
+import com.crib.server.common.ctrl_requests.SignInRequest;
+import com.crib.server.common.ctrl_requests.SignUpRequest;
+import com.crib.server.common.ctrl_responses.SignInResponse;
+import com.crib.server.common.ctrl_responses.SignUpResponse;
 import com.crib.server.services.AuthService;
 import com.crib.server.services.ServiceFactory;
 import org.springframework.web.bind.annotation.*;

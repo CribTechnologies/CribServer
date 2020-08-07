@@ -1,14 +1,14 @@
 package com.crib.server.common.patterns;
 
-public class RepositoryResponse {
+public class RepoResponse {
 
     private boolean successful;
     private String message;
 
-    public RepositoryResponse() {
+    public RepoResponse() {
     }
 
-    public RepositoryResponse(boolean successful, String message) {
+    public RepoResponse(boolean successful, String message) {
         this.successful = successful;
         this.message = message;
     }

@@ -1,7 +1,7 @@
-package com.crib.server.controllers.lock;
+package com.crib.server.controllers;
 
-import com.crib.server.controllers.lock.requests.RegisterLockRequest;
-import com.crib.server.controllers.lock.responses.RegisterLockResponse;
+import com.crib.server.common.ctrl_requests.RegisterLockRequest;
+import com.crib.server.common.ctrl_responses.RegisterLockResponse;
 import com.crib.server.services.LockService;
 import com.crib.server.services.ServiceFactory;
 import org.springframework.web.bind.annotation.PostMapping;

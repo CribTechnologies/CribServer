@@ -1,19 +1,20 @@
 package com.crib.server.repositories;
 
 import com.crib.server.FirebaseSetup;
-import com.crib.server.common.patterns.DataTransferObject;
-import com.crib.server.common.patterns.RepositoryResponse;
-import com.crib.server.common.patterns.RepositoryResponseWithPayload;
+import com.crib.server.common.patterns.DTO;
+import com.crib.server.common.patterns.RepoResponse;
+import com.crib.server.common.patterns.RepoResponseWP;
 import com.google.cloud.firestore.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
-public abstract class FirestoreRepository<T extends DataTransferObject> implements IRepository<T> {
+public abstract class FirestoreRepository<T extends DTO> implements IRepository<T> {
 
     private String collectionName;
     private CollectionReference collectionRef;
@@ -42,8 +43,8 @@ public abstract class FirestoreRepository<T extends DataTransferObject> implemen
     protected abstract Class<T> getDTOClass();
 
     // Reusable private methods
-    private RepositoryResponse createOrUpdate(T object) {
-        RepositoryResponse response = new RepositoryResponse();
+    private RepoResponse createOrUpdate(T object) {
+        RepoResponse response = new RepoResponse();
         try {
             getCollectionRef()
                     .document(object.getId())
@@ -59,8 +60,8 @@ public abstract class FirestoreRepository<T extends DataTransferObject> implemen
         return response;
     }
 
-    private RepositoryResponse createOrUpdateMany(List<T> objects) {
-        RepositoryResponse response = new RepositoryResponse();
+    private RepoResponse createOrUpdateMany(List<T> objects) {
+        RepoResponse response = new RepoResponse();
         try {
             WriteBatch batch = getDatabase().batch();
             for (T object : objects) {
@@ -77,8 +78,8 @@ public abstract class FirestoreRepository<T extends DataTransferObject> implemen
     }
 
     // Reusable protected methods
-    protected <T1> RepositoryResponse updateField(String id, String fieldName, T1 fieldValue) {
-        RepositoryResponse response = new RepositoryResponse();
+    protected <T1> RepoResponse updateField(String id, String fieldName, T1 fieldValue) {
+        RepoResponse response = new RepoResponse();
         try {
             getCollectionRef()
                     .document(id)
@@ -94,20 +95,37 @@ public abstract class FirestoreRepository<T extends DataTransferObject> implemen
         return response;
     }
 
+    protected RepoResponse updateFields(String id, Map<String, Object> fields) {
+        RepoResponse response = new RepoResponse();
+        try {
+            getCollectionRef()
+                    .document(id)
+                    .update(fields)
+                    .get();
+
+            response.setSuccessful(true);
+        }
+        catch (Exception e) {
+            response.setSuccessful(false);
+            response.setMessage(e.getMessage());
+        }
+        return response;
+    }
+
     // Inherited base methods
     @Override
-    public RepositoryResponse create(T object) {
+    public RepoResponse create(T object) {
         return createOrUpdate(object);
     }
 
     @Override
-    public RepositoryResponse createMany(List<T> objects) {
+    public RepoResponse createMany(List<T> objects) {
         return createOrUpdateMany(objects);
     }
 
     @Override
-    public RepositoryResponseWithPayload<T> getById(String id) {
-        RepositoryResponseWithPayload<T> response = new RepositoryResponseWithPayload<T>();
+    public RepoResponseWP<T> getById(String id) {
+        RepoResponseWP<T> response = new RepoResponseWP<T>();
         try {
             DocumentSnapshot document = getCollectionRef()
                     .document(id)
@@ -127,8 +145,8 @@ public abstract class FirestoreRepository<T extends DataTransferObject> implemen
     }
 
     @Override
-    public RepositoryResponseWithPayload<List<T>> getManyByIds(List<String> ids) {
-        RepositoryResponseWithPayload<List<T>> response = new RepositoryResponseWithPayload<>();
+    public RepoResponseWP<List<T>> getManyByIds(List<String> ids) {
+        RepoResponseWP<List<T>> response = new RepoResponseWP<>();
         List<String> unsuccessfulIds = new ArrayList<>();
         AtomicInteger successes = new AtomicInteger();
         AtomicInteger totalTasks = new AtomicInteger();
@@ -138,7 +156,7 @@ public abstract class FirestoreRepository<T extends DataTransferObject> implemen
             for (String id : ids) {
                 tasks.add(() -> {
                     totalTasks.getAndIncrement();
-                    RepositoryResponseWithPayload<T> partialResponse = getById(id);
+                    RepoResponseWP<T> partialResponse = getById(id);
                     if (partialResponse.isSuccessful()) {
                         objects.add(partialResponse.getPayload());
                         successes.getAndIncrement();
@@ -171,8 +189,8 @@ public abstract class FirestoreRepository<T extends DataTransferObject> implemen
     }
 
     @Override
-    public RepositoryResponseWithPayload<Stream<T>> getAll() {
-        RepositoryResponseWithPayload<Stream<T>> response = new RepositoryResponseWithPayload<>();
+    public RepoResponseWP<Stream<T>> getAll() {
+        RepoResponseWP<Stream<T>> response = new RepoResponseWP<>();
         try {
             List<QueryDocumentSnapshot> documents = getCollectionRef()
                     .get()
@@ -195,18 +213,18 @@ public abstract class FirestoreRepository<T extends DataTransferObject> implemen
     }
 
     @Override
-    public RepositoryResponse update(T object) {
+    public RepoResponse update(T object) {
         return createOrUpdate(object);
     }
 
     @Override
-    public RepositoryResponse updateMany(List<T> objects) {
+    public RepoResponse updateMany(List<T> objects) {
         return createOrUpdateMany(objects);
     }
 
     @Override
-    public RepositoryResponse delete(String id) {
-        RepositoryResponse response = new RepositoryResponse();
+    public RepoResponse delete(String id) {
+        RepoResponse response = new RepoResponse();
         try {
             getCollectionRef()
                     .document(id)
@@ -223,8 +241,8 @@ public abstract class FirestoreRepository<T extends DataTransferObject> implemen
     }
 
     @Override
-    public RepositoryResponse deleteMany(List<String> ids) {
-        RepositoryResponse response = new RepositoryResponse();
+    public RepoResponse deleteMany(List<String> ids) {
+        RepoResponse response = new RepoResponse();
         try {
             WriteBatch batch = getDatabase().batch();
 

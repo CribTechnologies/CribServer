@@ -1,4 +1,4 @@
-package com.crib.server.controllers.auth.responses;
+package com.crib.server.common.ctrl_responses;
 
 import com.crib.server.common.patterns.CtrlResponse;
 

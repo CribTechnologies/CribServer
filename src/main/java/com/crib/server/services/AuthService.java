@@ -4,19 +4,20 @@ import com.crib.server.Argon2Setup;
 import com.crib.server.JSONWebTokenSetup;
 import com.crib.server.common.entities.User;
 import com.crib.server.common.enums.ControllerResponseStatus;
-import com.crib.server.common.patterns.RepositoryResponse;
-import com.crib.server.common.patterns.RepositoryResponseWithPayload;
-import com.crib.server.controllers.auth.requests.SignInRequest;
-import com.crib.server.controllers.auth.requests.SignUpRequest;
-import com.crib.server.controllers.auth.responses.SignInResponse;
-import com.crib.server.controllers.auth.responses.SignUpResponse;
+import com.crib.server.common.patterns.CtrlResponseWP;
+import com.crib.server.common.patterns.RepoResponse;
+import com.crib.server.common.patterns.RepoResponseWP;
+import com.crib.server.common.ctrl_requests.SignInRequest;
+import com.crib.server.common.ctrl_requests.SignUpRequest;
+import com.crib.server.common.ctrl_responses.SignInResponse;
+import com.crib.server.common.ctrl_responses.SignUpResponse;
 import com.crib.server.repositories.RepositoryFactory;
 import com.crib.server.repositories.interfaces.IUserRepository;
 
 import java.util.Date;
 import java.util.UUID;
 
-public class AuthService {
+public class AuthService extends Service {
 
     private IUserRepository userRepository;
     private Argon2Setup argon2;
@@ -31,7 +32,7 @@ public class AuthService {
 
     public SignInResponse signIn(SignInRequest request) {
         SignInResponse response = new SignInResponse();
-        RepositoryResponseWithPayload<User> repositoryResponse = userRepository.getUserByEmail(request.getEmail());
+        RepoResponseWP<User> repositoryResponse = userRepository.getUserByEmail(request.getEmail());
         User user = repositoryResponse.getPayload();
         if (!repositoryResponse.isSuccessful()) {
             response.setStatus(ControllerResponseStatus.REPOSITORY_ERROR);
@@ -56,7 +57,7 @@ public class AuthService {
 
     public SignUpResponse signUp(SignUpRequest request) {
         SignUpResponse response = new SignUpResponse();
-        RepositoryResponseWithPayload<User> repositoryResponse1 = userRepository.getUserByEmail(request.getEmail());
+        RepoResponseWP<User> repositoryResponse1 = userRepository.getUserByEmail(request.getEmail());
         if (repositoryResponse1.getPayload() != null) {
             response.setStatus(ControllerResponseStatus.VALIDATION_ERROR);
             response.addMessage("This email is already registered");
@@ -71,14 +72,18 @@ public class AuthService {
         user.setPhoneNumber(request.getPhoneNumber());
         user.setGender(request.getGender());
 
+        // TODO send verification links to user
+        user.setEmailVerified(false);
+        user.setPhoneNumberVerified(false);
+
         user.setId(UUID.randomUUID().toString());
         user.setTimestamp(new Date().getTime());
         user.setPasswordHash(argon2.createHash(request.getPassword()));
 
-        RepositoryResponse repositoryResponse2 = userRepository.create(user);
-        if (repositoryResponse2.isSuccessful()) {
+        RepoResponse repoResponse2 = userRepository.create(user);
+        if (repoResponse2.isSuccessful()) {
             response.setStatus(ControllerResponseStatus.ERROR);
-            response.addMessage(repositoryResponse2.getMessage());
+            response.addMessage(repoResponse2.getMessage());
         }
         else {
             response.setStatus(ControllerResponseStatus.SUCCESS);
@@ -87,7 +92,8 @@ public class AuthService {
         return response;
     }
 
-    public boolean emailIsRegistered(String email) {
-        return userRepository.getUserByEmail(email).getPayload() == null;
+    public CtrlResponseWP<Boolean> emailIsRegistered(String email) {
+        RepoResponseWP<User> repoResponse = userRepository.getUserByEmail(email);
+        return repoToCtrlResponseWithCustomPayload(repoResponse, repoResponse.getPayload() == null);
     }
 }

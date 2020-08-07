@@ -1,11 +1,11 @@
 package com.crib.server.common.entities;
 
 import com.crib.server.common.enums.Gender;
-import com.crib.server.common.patterns.DataTransferObject;
+import com.crib.server.common.patterns.DTO;
 
 import java.util.Date;
 
-public class User extends DataTransferObject {
+public class User extends DTO {
 
     private String firstName;
     private String lastName;
@@ -14,6 +14,9 @@ public class User extends DataTransferObject {
     private Date dateOfBirth;
     private String phoneNumber;
     private Gender gender;
+
+    private boolean emailVerified;
+    private boolean phoneNumberVerified;
 
     public User() {
     }
@@ -72,5 +75,21 @@ public class User extends DataTransferObject {
 
     public void setGender(Gender gender) {
         this.gender = gender;
+    }
+
+    public boolean isEmailVerified() {
+        return emailVerified;
+    }
+
+    public void setEmailVerified(boolean emailVerified) {
+        this.emailVerified = emailVerified;
+    }
+
+    public boolean isPhoneNumberVerified() {
+        return phoneNumberVerified;
+    }
+
+    public void setPhoneNumberVerified(boolean phoneNumberVerified) {
+        this.phoneNumberVerified = phoneNumberVerified;
     }
 }

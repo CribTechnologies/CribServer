@@ -1,4 +1,4 @@
-package com.crib.server.controllers.auth.requests;
+package com.crib.server.common.ctrl_requests;
 
 import com.crib.server.common.patterns.CtrlRequest;
 

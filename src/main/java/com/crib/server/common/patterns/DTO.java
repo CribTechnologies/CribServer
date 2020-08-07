@@ -1,11 +1,11 @@
 package com.crib.server.common.patterns;
 
-public class DataTransferObject {
+public class DTO {
 
     private String id;
     private long timestamp;
 
-    public DataTransferObject() {
+    public DTO() {
     }
 
     public String getId() {
