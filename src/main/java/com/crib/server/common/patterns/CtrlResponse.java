@@ -14,6 +14,12 @@ public class CtrlResponse {
         messages = new ArrayList<String>();
     }
 
+    public CtrlResponse(ControllerResponseStatus status, String message) {
+        this.status = status;
+        this.messages = new ArrayList<>();
+        this.messages.add(message);
+    }
+
     public void addMessage(String message) {
         if (message != null)
             messages.add(message);

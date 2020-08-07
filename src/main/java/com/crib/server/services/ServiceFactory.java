@@ -3,10 +3,10 @@ package com.crib.server.services;
 public class ServiceFactory {
 
     private static ServiceFactory singleInstance = null;
-    private AuthService authService;
-    private UserService userService;
-    private LockService lockService;
-    private HomeService homeService;
+    private final AuthService authService;
+    private final UserService userService;
+    private final LockService lockService;
+    private final HomeService homeService;
 
     private ServiceFactory() {
         authService = new AuthService();

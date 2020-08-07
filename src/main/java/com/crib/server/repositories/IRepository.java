@@ -13,6 +13,7 @@ public interface IRepository<T extends DTO> {
     RepoResponse createMany(List<T> objects);
 
     RepoResponseWP<T> getById(String id);
+    RepoResponseWP<List<T>> getByIds(List<String> ids);
     RepoResponseWP<List<T>> getManyByIds(List<String> ids);
     RepoResponseWP<Stream<T>> getAll();
 

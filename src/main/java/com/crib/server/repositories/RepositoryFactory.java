@@ -10,9 +10,9 @@ import com.crib.server.repositories.interfaces.IUserRepository;
 public class RepositoryFactory {
 
     private static RepositoryFactory singleInstance = null;
-    private IUserRepository userRepository;
-    private ILockRepository lockRepository;
-    private IHomeRepository homeRepository;
+    private final IUserRepository userRepository;
+    private final ILockRepository lockRepository;
+    private final IHomeRepository homeRepository;
 
     private RepositoryFactory() {
         userRepository = new UserRepository();

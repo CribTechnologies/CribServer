@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Stream;
 
@@ -142,6 +143,62 @@ public abstract class FirestoreRepository<T extends DTO> implements IRepository<
             response.setMessage(e.getMessage());
         }
         return response;
+    }
+
+    @Override
+    public RepoResponseWP<List<T>> getByIds(List<String> ids) {
+        RepoResponseWP<List<T>> repoResponse = new RepoResponseWP<>();
+        int partitions = (int) Math.ceil(ids.size()/10.0);
+
+        List<List<String>> idsPartitions = new ArrayList<>();
+        for (int i = 0; i < partitions; i++) {
+            List<String> idsPartition = new ArrayList<>();
+            for (int j = 0; j < 10; j++) {
+                if ((i*10)+j > ids.size()-1) break;
+                idsPartition.add(ids.get((i*10)+j));
+            }
+            idsPartitions.add(idsPartition);
+        }
+
+        List<Runnable> tasks = new ArrayList<>();
+        List<T> objects = new ArrayList<>();
+        List<String> messages = new ArrayList<>();
+        AtomicBoolean successful = new AtomicBoolean(true);
+        for (List<String> idsPartition : idsPartitions) {
+            tasks.add(() -> {
+                try {
+                    List<QueryDocumentSnapshot> documents = getCollectionRef()
+                            .whereIn("id", idsPartition)
+                            .get()
+                            .get()
+                            .getDocuments();
+
+                    for (QueryDocumentSnapshot document : documents) {
+                        objects.add(document.toObject(getDTOClass()));
+                    }
+                }
+                catch (Exception e) {
+                    messages.add(e.getMessage());
+                    successful.set(false);
+                }
+            });
+        }
+
+        ExecutorService executorService = Executors.newCachedThreadPool();
+        for (Runnable task : tasks) {
+            executorService.execute(task);
+        }
+        executorService.shutdown();
+
+        if (successful.get()) {
+            repoResponse.setSuccessful(true);
+            repoResponse.setPayload(objects);
+        }
+        else {
+            repoResponse.setSuccessful(false);
+            repoResponse.setMessage(String.join(";;;", messages));
+        }
+        return repoResponse;
     }
 
     @Override

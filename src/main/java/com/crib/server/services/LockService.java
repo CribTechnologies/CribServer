@@ -2,6 +2,8 @@ package com.crib.server.services;
 
 import com.crib.server.common.entities.Lock;
 import com.crib.server.common.enums.ControllerResponseStatus;
+import com.crib.server.common.enums.LockType;
+import com.crib.server.common.patterns.CtrlResponse;
 import com.crib.server.common.patterns.RepoResponse;
 import com.crib.server.common.ctrl_requests.RegisterLockRequest;
 import com.crib.server.common.ctrl_responses.RegisterLockResponse;
@@ -40,5 +42,13 @@ public class LockService extends Service {
             response.setStatus(ControllerResponseStatus.REPOSITORY_ERROR);
         }
         return response;
+    }
+
+    public CtrlResponse updateName(String lockId, String name) {
+        return repoToCtrlResponse(lockRepository.updateName(lockId, name));
+    }
+
+    public CtrlResponse updateLockType(String lockId, LockType lockType) {
+        return repoToCtrlResponse(lockRepository.updateType(lockId, lockType));
     }
 }
