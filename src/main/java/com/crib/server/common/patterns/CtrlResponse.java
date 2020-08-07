@@ -5,22 +5,24 @@ import com.crib.server.common.enums.ControllerResponseStatus;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ControllerResponse {
+public class CtrlResponse {
 
     private ControllerResponseStatus status;
     private List<String> messages;
 
-    public ControllerResponse() {
+    public CtrlResponse() {
         messages = new ArrayList<String>();
     }
 
     public void addMessage(String message) {
-        messages.add(message);
+        if (message != null)
+            messages.add(message);
     }
 
     public void addMessages(List<String> messages) {
         for (String message : messages) {
-            addMessage(message);
+            if (message != null)
+                addMessage(message);
         }
     }
 

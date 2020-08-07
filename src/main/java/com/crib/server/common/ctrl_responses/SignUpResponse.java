@@ -1,8 +1,8 @@
 package com.crib.server.controllers.auth.responses;
 
-import com.crib.server.common.patterns.ControllerResponse;
+import com.crib.server.common.patterns.CtrlResponse;
 
-public class SignUpResponse extends ControllerResponse {
+public class SignUpResponse extends CtrlResponse {
 
     private String userId;
 
