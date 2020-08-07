@@ -1,6 +1,7 @@
 package com.crib.server.services;
 
 import com.crib.server.common.ctrl_requests.CreateHomeRequest;
+import com.crib.server.common.ctrl_requests.UpdateHomeAddressRequest;
 import com.crib.server.common.ctrl_responses.ViewHomeDetailsResponse;
 import com.crib.server.common.entities.Home;
 import com.crib.server.common.entities.Lock;
@@ -96,11 +97,11 @@ public class HomeService extends Service {
         return ctrlResponseWP;
     }
 
-    public CtrlResponseWP<Home> getHomeById(String homeId) {
+    public CtrlResponseWP<Home> getHomeById(String homeId, String userAccessorId) {
         return repoToCtrlResponseWithPayload(homeRepository.getById(homeId));
     }
 
-    public ViewHomeDetailsResponse getHomeDetails(String homeId) {
+    public ViewHomeDetailsResponse getHomeDetails(String homeId, String userAccessorId) {
         ViewHomeDetailsResponse response = new ViewHomeDetailsResponse();
         try {
             RepoResponseWP<Home> repoResponseWP = homeRepository.getById(homeId);
@@ -176,7 +177,27 @@ public class HomeService extends Service {
         return repoToCtrlResponse(homeRepository.updateName(homeId, name));
     }
 
-    public CtrlResponse updateAddress(String homeId, String userAccessorId, PhysicalAddress address) {
-        return repoToCtrlResponse(homeRepository.updateAddress(homeId, address));
+    // request includes userAccessorId
+    public CtrlResponse updateAddress(UpdateHomeAddressRequest request) {
+        String userAccessorId = request.getUserAccessorId();
+
+        PhysicalAddress address = new PhysicalAddress();
+        address.setPrimaryStreet(request.getAddressPrimaryStreet());
+        address.setSecondaryStreet(request.getAddressSecondaryStreet());
+        address.setCity(request.getAddressCity());
+        address.setState(request.getAddressState());
+        address.setCountry(request.getAddressCountry());
+        address.setZipCode(request.getAddressZipCode());
+
+        String fullAddress = String.format("%s, %s, %s, %s %s, %s",
+                request.getAddressPrimaryStreet(),
+                request.getAddressSecondaryStreet(),
+                request.getAddressCity(),
+                request.getAddressState(),
+                request.getAddressCountry(),
+                request.getAddressZipCode());
+        address.setFullAddress(fullAddress);
+
+        return repoToCtrlResponse(homeRepository.updateAddress(request.getHomeId(), address));
     }
 }
