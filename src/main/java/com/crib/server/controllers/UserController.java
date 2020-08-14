@@ -4,10 +4,7 @@ import com.crib.server.common.enums.Gender;
 import com.crib.server.common.patterns.CtrlResponse;
 import com.crib.server.services.ServiceFactory;
 import com.crib.server.services.UserService;
-import org.springframework.web.bind.annotation.PatchMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
@@ -26,40 +23,40 @@ public class UserController {
         userService = factory.getUserService();
     }
 
-    @PatchMapping("/name")
+    @PostMapping("/updateUser/name")
     public CtrlResponse updateName(@RequestBody @NotNull @Size(min = 1, max = 128) String userId,
                                    @RequestBody @NotNull @Size(min = 1, max = 128) String firstName,
                                    @RequestBody @NotNull @Size(min = 1, max = 128) String lastName) {
         return userService.updateFirstAndLastName(userId, firstName, lastName);
     }
 
-    @PatchMapping("/dob")
+    @PostMapping("/updateUser/dob")
     public CtrlResponse updateDateOfBirth(@RequestBody @NotNull @Size(min = 1, max = 128) String userId,
                                           @RequestBody @NotNull @Past Date dateOfBirth) {
         return userService.updateDateOfBirth(userId, dateOfBirth);
     }
 
-    @PatchMapping("/gender")
+    @PostMapping("/updateUser/gender")
     public CtrlResponse updateGender(@RequestBody @NotNull @Size(min = 1, max = 128) String userId,
                                      @RequestBody @NotNull Gender gender) {
         return userService.updateGender(userId, gender);
     }
 
-    @PatchMapping("/password")
+    @PostMapping("/updateUser/password")
     public CtrlResponse updatePassword(@RequestBody @NotNull @Size(min = 1, max = 128) String userId,
                                        @RequestBody @NotNull @Size(min = 6, max = 1024) String oldPassword,
                                        @RequestBody @NotNull @Size(min = 6, max = 1024) String newPassword) {
         return userService.updatePassword(userId, oldPassword, newPassword);
     }
 
-    @PatchMapping("/email")
+    @PostMapping("/updateUser/email")
     public CtrlResponse updateEmail(@RequestBody @NotNull @Size(min = 1, max = 128) String userId,
                                     @RequestBody @NotNull @Size(min = 6, max = 1024) String password,
                                     @RequestBody @NotNull @Email @Size(min = 6, max = 1024) String email) {
         return userService.updateEmail(userId, password, email);
     }
 
-    @PatchMapping("/phonenumber")
+    @PostMapping("/updateUser/phonenumber")
     public CtrlResponse updatePhoneNumber(@RequestBody @NotNull @Size(min = 1, max = 128) String userId,
                                           @RequestBody @NotNull @Size(min = 6, max = 1024) String password,
                                           @RequestBody @NotNull @Size(min = 1, max = 128) String phoneNumber) {

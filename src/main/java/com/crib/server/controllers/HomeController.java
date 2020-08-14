@@ -30,39 +30,39 @@ public class HomeController {
         return homeService.createHome(request);
     }
 
-    @GetMapping("/getById")
+    @PostMapping("/getById")
     public CtrlResponseWP<Home> getHomeById(@RequestBody @NotNull @Size(min = 1, max = 128) String homeId,
                                             @RequestBody @NotNull @Size(min = 1, max = 128) String userAccessorId) {
         return homeService.getHomeById(homeId, userAccessorId);
     }
 
-    @GetMapping("/getDetails")
+    @PostMapping("/getDetails")
     public ViewHomeDetailsResponse viewHomeDetails(@RequestBody @NotNull @Size(min = 1, max = 128) String homeId,
                                                    @RequestBody @NotNull @Size(min = 1, max = 128) String userAccessorId) {
         return homeService.getHomeDetails(homeId, userAccessorId);
     }
 
-    @DeleteMapping("/delete")
+    @PostMapping("/delete")
     public CtrlResponse deleteHomeById(@RequestBody @NotNull @Size(min = 1, max = 128) String homeId,
                                        @RequestBody @NotNull @Size(min = 1, max = 128) String userAccessorId) {
         return homeService.deleteHomeById(homeId, userAccessorId);
     }
 
-    @PostMapping("/lockChange")
+    @PostMapping("/addLock")
     public CtrlResponse addLockToHome(@RequestBody @NotNull @Size(min = 1, max = 128) String homeId,
                                       @RequestBody @NotNull @Size(min = 1, max = 128) String userAccessorId,
                                       @RequestBody @NotNull @Size(min = 1, max = 128) String lockId) {
         return homeService.addLockToHome(homeId, userAccessorId, lockId);
     }
 
-    @DeleteMapping("/lockChange")
+    @PostMapping("/removeLock")
     public CtrlResponse removeLockFromHome(@RequestBody @NotNull @Size(min = 1, max = 128) String homeId,
                                            @RequestBody @NotNull @Size(min = 1, max = 128) String userAccessorId,
                                            @RequestBody @NotNull @Size(min = 1, max = 128) String lockId) {
         return homeService.removeLockFromHome(homeId, userAccessorId, lockId);
     }
 
-    @PostMapping("/memberRoles")
+    @PostMapping("/addMemberRole")
     public CtrlResponse addUserWithRole(@RequestBody @NotNull @Size(min = 1, max = 128) String homeId,
                                       @RequestBody @NotNull @Size(min = 1, max = 128) String userAccessorId,
                                       @RequestBody @NotNull @Size(min = 1, max = 128) String userId,
@@ -70,7 +70,7 @@ public class HomeController {
         return homeService.addUserWithRole(homeId, userAccessorId, userId, role);
     }
 
-    @DeleteMapping("/memberRoles")
+    @PostMapping("/removeMemberRole")
     public CtrlResponse removeUserWithRole(@RequestBody @NotNull @Size(min = 1, max = 128) String homeId,
                                            @RequestBody @NotNull @Size(min = 1, max = 128) String userAccessorId,
                                            @RequestBody @NotNull @Size(min = 1, max = 128) String userId,
@@ -78,7 +78,7 @@ public class HomeController {
         return homeService.removeUserWithRole(homeId, userAccessorId, userId, role);
     }
 
-    @PatchMapping("/memberRoles")
+    @PostMapping("/changeMemberRole")
     public CtrlResponse changeUserWithRole(@RequestBody @NotNull @Size(min = 1, max = 128) String homeId,
                                            @RequestBody @NotNull @Size(min = 1, max = 128) String userAccessorId,
                                            @RequestBody @NotNull @Size(min = 1, max = 128) String userId,
@@ -86,14 +86,14 @@ public class HomeController {
         return homeService.changeUserWithRole(homeId, userAccessorId, userId, role);
     }
 
-    @PatchMapping("/settings/name")
+    @PostMapping("/updateSettings/name")
     public CtrlResponse updateName(@RequestBody @NotNull @Size(min = 1, max = 128) String homeId,
                                    @RequestBody @NotNull @Size(min = 1, max = 128) String userAccessorId,
                                    @RequestBody @NotNull @Size(min = 1, max = 128) String name) {
         return homeService.updateName(homeId, userAccessorId, name);
     }
 
-    @PatchMapping("/settings/address")
+    @PostMapping("/updateSettings/address")
     public CtrlResponse updateAddress(@RequestBody UpdateHomeAddressRequest request) {
         return homeService.updateAddress(request);
     }

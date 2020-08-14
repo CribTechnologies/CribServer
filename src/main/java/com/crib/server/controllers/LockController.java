@@ -27,13 +27,13 @@ public class LockController {
         return lockService.registerLock(request);
     }
 
-    @PatchMapping("/update/name")
+    @PostMapping("/updateLock/name")
     public CtrlResponse updateLockName(@RequestBody @NotNull @Size(min = 1, max = 128) String lockId,
                                        @RequestBody @NotNull @Size(min = 1, max = 128) String name) {
         return lockService.updateName(lockId, name);
     }
 
-    @PatchMapping("/update/type")
+    @PostMapping("/updateLock/type")
     public CtrlResponse updateLockType(@RequestBody @NotNull @Size(min = 1, max = 128) String lockId,
                                        @RequestBody @NotNull LockType lockType) {
         return lockService.updateLockType(lockId, lockType);

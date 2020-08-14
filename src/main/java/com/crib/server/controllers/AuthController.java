@@ -23,7 +23,7 @@ public class AuthController {
         authService = serviceFactory.getAuthService();
     }
 
-    @GetMapping("/signin")
+    @PostMapping("/signin")
     public SignInResponse signIn(@RequestBody SignInRequest request) {
         return authService.signIn(request);
     }
@@ -33,7 +33,7 @@ public class AuthController {
         return authService.signUp(request);
     }
 
-    @GetMapping("/emailisregistered")
+    @PostMapping("/emailisregistered")
     public CtrlResponseWP<Boolean> emailIsRegistered(@RequestBody @NotNull @Email String email) {
         return authService.emailIsRegistered(email);
     }
