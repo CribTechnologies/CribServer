@@ -1,7 +1,6 @@
 package com.crib.server.services;
 
-import com.crib.server.common.entities.User;
-import com.crib.server.common.enums.ControllerResponseStatus;
+import com.crib.server.common.enums.CtrlResponseStatus;
 import com.crib.server.common.patterns.CtrlResponse;
 import com.crib.server.common.patterns.CtrlResponseWP;
 import com.crib.server.common.patterns.RepoResponse;
@@ -13,8 +12,8 @@ public abstract class Service {
         CtrlResponse response = new CtrlResponse();
 
         response.setStatus(repoResponse.isSuccessful()
-                ? ControllerResponseStatus.SUCCESS
-                : ControllerResponseStatus.REPOSITORY_ERROR);
+                ? CtrlResponseStatus.SUCCESS
+                : CtrlResponseStatus.REPOSITORY_ERROR);
         response.addMessage(repoResponse.getMessage());
         return response;
     }
@@ -23,8 +22,8 @@ public abstract class Service {
         CtrlResponseWP<T1> response = new CtrlResponseWP<>();
 
         response.setStatus(repoResponse.isSuccessful()
-                ? ControllerResponseStatus.SUCCESS
-                : ControllerResponseStatus.REPOSITORY_ERROR);
+                ? CtrlResponseStatus.SUCCESS
+                : CtrlResponseStatus.REPOSITORY_ERROR);
         response.addMessage(repoResponse.getMessage());
         response.setPayload(repoResponse.getPayload());
         return response;
@@ -34,8 +33,8 @@ public abstract class Service {
         CtrlResponseWP<T2> response = new CtrlResponseWP<>();
 
         response.setStatus(repoResponse.isSuccessful()
-                ? ControllerResponseStatus.SUCCESS
-                : ControllerResponseStatus.REPOSITORY_ERROR);
+                ? CtrlResponseStatus.SUCCESS
+                : CtrlResponseStatus.REPOSITORY_ERROR);
         response.addMessage(repoResponse.getMessage());
         response.setPayload(payload);
         return response;
@@ -43,7 +42,7 @@ public abstract class Service {
 
     protected CtrlResponse unauthenticatedResponse(String message) {
         CtrlResponse ctrlResponse = new CtrlResponse();
-        ctrlResponse.setStatus(ControllerResponseStatus.VALIDATION_ERROR);
+        ctrlResponse.setStatus(CtrlResponseStatus.VALIDATION_ERROR);
         ctrlResponse.addMessage(message);
         return ctrlResponse;
     }

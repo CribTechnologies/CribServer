@@ -1,20 +1,20 @@
 package com.crib.server.common.patterns;
 
-import com.crib.server.common.enums.ControllerResponseStatus;
+import com.crib.server.common.enums.CtrlResponseStatus;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class CtrlResponse {
 
-    private ControllerResponseStatus status;
+    private CtrlResponseStatus status;
     private List<String> messages;
 
     public CtrlResponse() {
         messages = new ArrayList<String>();
     }
 
-    public CtrlResponse(ControllerResponseStatus status, String message) {
+    public CtrlResponse(CtrlResponseStatus status, String message) {
         this.status = status;
         this.messages = new ArrayList<>();
         this.messages.add(message);
@@ -32,11 +32,11 @@ public class CtrlResponse {
         }
     }
 
-    public ControllerResponseStatus getStatus() {
+    public CtrlResponseStatus getStatus() {
         return status;
     }
 
-    public void setStatus(ControllerResponseStatus status) {
+    public void setStatus(CtrlResponseStatus status) {
         this.status = status;
     }
 

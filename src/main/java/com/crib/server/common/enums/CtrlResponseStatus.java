@@ -1,6 +1,6 @@
 package com.crib.server.common.enums;
 
-public enum ControllerResponseStatus {
+public enum CtrlResponseStatus {
     SUCCESS,
     ERROR,
     AUTH_ERROR,

@@ -2,8 +2,9 @@ package com.crib.server.services;
 
 import com.crib.server.Argon2Setup;
 import com.crib.server.JSONWebTokenSetup;
+import com.crib.server.common.entities.EmailVerificationCode;
 import com.crib.server.common.entities.User;
-import com.crib.server.common.enums.ControllerResponseStatus;
+import com.crib.server.common.enums.CtrlResponseStatus;
 import com.crib.server.common.patterns.CtrlResponseWP;
 import com.crib.server.common.patterns.RepoResponse;
 import com.crib.server.common.patterns.RepoResponseWP;
@@ -23,6 +24,8 @@ public class AuthService extends Service {
     private Argon2Setup argon2;
     private JSONWebTokenSetup jwt;
 
+    private final String alphanumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
     public AuthService() {
         RepositoryFactory repositoryFactory = RepositoryFactory.getInstance();
         userRepository = repositoryFactory.getUserRepository();
@@ -35,20 +38,20 @@ public class AuthService extends Service {
         RepoResponseWP<User> repositoryResponse = userRepository.getUserByEmail(request.getEmail());
         User user = repositoryResponse.getPayload();
         if (!repositoryResponse.isSuccessful()) {
-            response.setStatus(ControllerResponseStatus.REPOSITORY_ERROR);
+            response.setStatus(CtrlResponseStatus.REPOSITORY_ERROR);
             response.addMessage("There was an internal error");
             response.addMessage("Repository Error: " + repositoryResponse.getMessage());
         }
         else if (user == null) {
-            response.setStatus(ControllerResponseStatus.AUTH_ERROR);
+            response.setStatus(CtrlResponseStatus.AUTH_ERROR);
             response.addMessage("This email is not registered");
         }
         else if (!argon2.rawAndHashAreEqual(request.getPassword(), repositoryResponse.getPayload().getPasswordHash())) {
-            response.setStatus(ControllerResponseStatus.AUTH_ERROR);
+            response.setStatus(CtrlResponseStatus.AUTH_ERROR);
             response.addMessage("The email and password do not match");
         }
         else {
-            response.setStatus(ControllerResponseStatus.SUCCESS);
+            response.setStatus(CtrlResponseStatus.SUCCESS);
             response.setUserId(user.getId());
             response.setAuthenticationToken(jwt.generateSignInToken(user.getId()));
         }
@@ -59,7 +62,7 @@ public class AuthService extends Service {
         SignUpResponse response = new SignUpResponse();
         RepoResponseWP<User> repositoryResponse1 = userRepository.getUserByEmail(request.getEmail());
         if (repositoryResponse1.getPayload() != null) {
-            response.setStatus(ControllerResponseStatus.VALIDATION_ERROR);
+            response.setStatus(CtrlResponseStatus.VALIDATION_ERROR);
             response.addMessage("This email is already registered");
             return response;
         }
@@ -72,7 +75,7 @@ public class AuthService extends Service {
         user.setPhoneNumber(request.getPhoneNumber());
         user.setGender(request.getGender());
 
-        // TODO send verification links to user
+        // TODO send phone verification link
         user.setEmailVerified(false);
         user.setPhoneNumberVerified(false);
 
@@ -80,13 +83,25 @@ public class AuthService extends Service {
         user.setTimestamp(new Date().getTime());
         user.setPasswordHash(argon2.createHash(request.getPassword()));
 
+        EmailVerificationCode code = new EmailVerificationCode();
+        code.setUserId(UUID.randomUUID().toString());
+        code.setTimestamp(new Date().getTime());
+        code.setUserId(user.getId());
+
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 128; i++) {
+            int random = (int) Math.floor(Math.random() * alphanumeric.length());
+            sb.append(alphanumeric.charAt(random));
+        }
+        code.setVerificationCode(sb.toString());
+
         RepoResponse repoResponse2 = userRepository.create(user);
         if (repoResponse2.isSuccessful()) {
-            response.setStatus(ControllerResponseStatus.ERROR);
+            response.setStatus(CtrlResponseStatus.ERROR);
             response.addMessage(repoResponse2.getMessage());
         }
         else {
-            response.setStatus(ControllerResponseStatus.SUCCESS);
+            response.setStatus(CtrlResponseStatus.SUCCESS);
             response.setUserId(user.getId());
         }
         return response;

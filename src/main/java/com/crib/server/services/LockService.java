@@ -1,7 +1,7 @@
 package com.crib.server.services;
 
 import com.crib.server.common.entities.Lock;
-import com.crib.server.common.enums.ControllerResponseStatus;
+import com.crib.server.common.enums.CtrlResponseStatus;
 import com.crib.server.common.enums.LockType;
 import com.crib.server.common.patterns.CtrlResponse;
 import com.crib.server.common.patterns.RepoResponse;
@@ -35,11 +35,11 @@ public class LockService extends Service {
 
         RepoResponse repoResponse = lockRepository.create(lock);
         if (repoResponse.isSuccessful()) {
-            response.setStatus(ControllerResponseStatus.SUCCESS);
+            response.setStatus(CtrlResponseStatus.SUCCESS);
             response.setLockId(lock.getId());
         }
         else {
-            response.setStatus(ControllerResponseStatus.REPOSITORY_ERROR);
+            response.setStatus(CtrlResponseStatus.REPOSITORY_ERROR);
         }
         return response;
     }

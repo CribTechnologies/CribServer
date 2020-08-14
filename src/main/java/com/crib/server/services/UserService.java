@@ -2,7 +2,6 @@ package com.crib.server.services;
 
 import com.crib.server.Argon2Setup;
 import com.crib.server.common.entities.User;
-import com.crib.server.common.enums.ControllerResponseStatus;
 import com.crib.server.common.enums.Gender;
 import com.crib.server.common.patterns.CtrlResponse;
 import com.crib.server.common.patterns.RepoResponseWP;

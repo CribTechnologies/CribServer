@@ -6,7 +6,7 @@ import com.crib.server.common.ctrl_responses.ViewHomeDetailsResponse;
 import com.crib.server.common.entities.Home;
 import com.crib.server.common.entities.Lock;
 import com.crib.server.common.entities.User;
-import com.crib.server.common.enums.ControllerResponseStatus;
+import com.crib.server.common.enums.CtrlResponseStatus;
 import com.crib.server.common.enums.UserHomeRole;
 import com.crib.server.common.patterns.CtrlResponse;
 import com.crib.server.common.patterns.CtrlResponseWP;
@@ -87,11 +87,11 @@ public class HomeService extends Service {
 
         RepoResponse repoResponse = homeRepository.create(home);
         if (repoResponse.isSuccessful()) {
-            ctrlResponseWP.setStatus(ControllerResponseStatus.SUCCESS);
+            ctrlResponseWP.setStatus(CtrlResponseStatus.SUCCESS);
             ctrlResponseWP.setPayload(home);
         }
         else {
-            ctrlResponseWP.setStatus(ControllerResponseStatus.REPOSITORY_ERROR);
+            ctrlResponseWP.setStatus(CtrlResponseStatus.REPOSITORY_ERROR);
             ctrlResponseWP.addMessage(repoResponse.getMessage());
         }
         return ctrlResponseWP;
@@ -128,13 +128,13 @@ public class HomeService extends Service {
             getUsersThread.join();
             getLocksThread.join();
 
-            response.setStatus(ControllerResponseStatus.SUCCESS);
+            response.setStatus(CtrlResponseStatus.SUCCESS);
             response.setHome(home);
             response.setUsers(getUsersResponseRef.get().getPayload());
             response.setLocks(getLocksResponseRef.get().getPayload());
         }
         catch (Exception e) {
-            response.setStatus(ControllerResponseStatus.REPOSITORY_ERROR);
+            response.setStatus(CtrlResponseStatus.REPOSITORY_ERROR);
             response.addMessage(e.getMessage());
         }
         return response;
