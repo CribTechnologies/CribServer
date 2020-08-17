@@ -1,6 +1,7 @@
 package com.crib.server.services;
 
 import com.crib.server.Argon2Setup;
+import com.crib.server.EnvVariables;
 import com.crib.server.JSONWebTokenSetup;
 import com.crib.server.common.ctrl_requests.EmailRegisteredRequest;
 import com.crib.server.common.ctrl_requests.SignInRequest;
@@ -8,12 +9,15 @@ import com.crib.server.common.ctrl_requests.SignUpRequest;
 import com.crib.server.common.ctrl_responses.EmailRegisteredResponse;
 import com.crib.server.common.ctrl_responses.SignInResponse;
 import com.crib.server.common.ctrl_responses.SignUpResponse;
+import com.crib.server.common.entities.EmailCode;
 import com.crib.server.common.entities.User;
 import com.crib.server.common.enums.CtrlResponseStatus;
 import com.crib.server.common.patterns.RepoResponse;
 import com.crib.server.common.patterns.RepoResponseWP;
 import com.crib.server.repositories.RepositoryFactory;
 import com.crib.server.repositories.interfaces.IUserRepository;
+import com.crib.server.services.helpers.EmailHelper;
+import com.crib.server.services.helpers.StringGeneratorHelper;
 import com.crib.server.services.helpers.ValidationHelper;
 
 import java.util.Date;
@@ -24,8 +28,6 @@ public class AuthService extends Service {
     private IUserRepository userRepository;
     private Argon2Setup argon2;
     private JSONWebTokenSetup jwt;
-
-    private final String alphanumeric = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
 
     public AuthService() {
         RepositoryFactory repositoryFactory = RepositoryFactory.getInstance();
@@ -92,17 +94,20 @@ public class AuthService extends Service {
         user.setTimestamp(new Date().getTime());
         user.setPasswordHash(argon2.createHash(request.getPassword()));
 
-//        EmailCode code = new EmailCode();
-//        code.setUserId(UUID.randomUUID().toString());
-//        code.setTimestamp(new Date().getTime());
-//        code.setUserId(user.getId());
-//
-//        StringBuilder sb = new StringBuilder();
-//        for (int i = 0; i < 128; i++) {
-//            int random = (int) Math.floor(Math.random() * alphanumeric.length());
-//            sb.append(alphanumeric.charAt(random));
-//        }
-//        code.setVerificationCode(sb.toString());
+        // Generate email code and send email
+        EmailCode code = new EmailCode();
+        code.setUserId(UUID.randomUUID().toString());
+        code.setTimestamp(new Date().getTime());
+        code.setUserId(user.getId());
+
+        String generatedCode = StringGeneratorHelper.generateRandomString(128);
+        code.setCodeHash(argon2.createHash(generatedCode));
+
+        EmailHelper.sendPlainTextEmail(user.getFirstName() + " " + user.getLastName(), user.getEmail(),
+                "Crib: Verify your email",
+                "We are so excited to have you, " + user.getFirstName() + " " + user.getLastName() + "! Before you continue," +
+                        "you must verify your email. Click this link to do so: " +
+                        EnvVariables.BASE_URL + "verifyemail?code=" + generatedCode + "&userId=" + user.getId());
 
         RepoResponse repoResponse2 = userRepository.create(user);
         if (repoResponse2.isSuccessful()) {

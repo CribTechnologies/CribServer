@@ -15,16 +15,13 @@ public class ValidationHelper {
     private static ValidatorFactory factory;
     private static Validator validator;
 
-    private static void initValidatorFactory() {
+    static {
         factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
     }
 
     // Returns true if errors exist, false if no errors
     public static <T1 extends CtrlRequest, T2 extends CtrlResponse> boolean addValidationErrorsToResponse(T1 request, T2 response) {
-        if (factory == null) {
-            initValidatorFactory();
-        }
         Set<ConstraintViolation<T1>> violations = validator.validate(request);
 
         for (ConstraintViolation<T1> violation : violations) {

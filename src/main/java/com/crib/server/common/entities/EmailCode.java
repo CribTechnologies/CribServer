@@ -5,7 +5,7 @@ import com.crib.server.common.patterns.DTO;
 public class EmailCode extends DTO {
 
     private String userId;
-    private String verificationCode;
+    private String codeHash;
 
     public EmailCode() {
     }
@@ -18,11 +18,11 @@ public class EmailCode extends DTO {
         this.userId = userId;
     }
 
-    public String getVerificationCode() {
-        return verificationCode;
+    public String getCodeHash() {
+        return codeHash;
     }
 
-    public void setVerificationCode(String verificationCode) {
-        this.verificationCode = verificationCode;
+    public void setCodeHash(String codeHash) {
+        this.codeHash = codeHash;
     }
 }

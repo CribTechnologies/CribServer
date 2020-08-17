@@ -34,4 +34,5 @@ build/
 
 ### MANUAL ###
 src/main/java/com/crib/server/private/
+src/main/java/com/crib/server/EnvVariables.java
 **/.DS_Store

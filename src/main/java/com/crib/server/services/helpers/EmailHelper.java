@@ -8,25 +8,25 @@ import org.simplejavamail.mailer.MailerBuilder;
 
 public class EmailHelper {
 
-    private Mailer mailer;
+    private static Mailer mailer;
 
-    public EmailHelper() {
-        Mailer mailer = MailerBuilder
-                .withSMTPServer("smtp.host.com", 587, "user@host.com", "password")
+    private static String senderEmail;
+    private static String senderName;
+
+    static {
+        senderEmail = "crib@gmail.com";
+        senderName = "Crib";
+
+        mailer = MailerBuilder
+                .withSMTPServer("smtp.gmail.com", 25, senderEmail, "PASSWORD")
                 .withTransportStrategy(TransportStrategy.SMTP_TLS)
-                .withProxy("socksproxy.host.com", 1080, "proxy user", "proxy password")
-                .withSessionTimeout(10 * 1000)
-                .clearEmailAddressCriteria()
-                .withProperty("mail.smtp.sendpartial", true)
-                .withDebugLogging(true)
-                .async()
                 .buildMailer();
     }
 
-    public void sendPlainTextEmail(String fromName, String fromEmail, String toName, String toEmail, String subject, String message) {
+    public static void sendPlainTextEmail(String toName, String toEmail, String subject, String message) {
         Email email = EmailBuilder
                 .startingBlank()
-                .from(fromName, fromEmail)
+                .from(senderName, senderEmail)
                 .to(toName, toEmail)
                 .withSubject(subject)
                 .withPlainText(message)
