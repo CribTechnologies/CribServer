@@ -3,10 +3,11 @@ package com.crib.server.controllers;
 import com.crib.server.common.enums.Gender;
 import com.crib.server.common.patterns.CtrlResponse;
 import com.crib.server.services.ServiceFactory;
-import com.crib.server.services.UserService;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.PostConstruct;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Past;

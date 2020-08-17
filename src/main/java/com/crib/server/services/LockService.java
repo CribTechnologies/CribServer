@@ -1,12 +1,12 @@
 package com.crib.server.services;
 
+import com.crib.server.common.ctrl_requests.RegisterLockRequest;
+import com.crib.server.common.ctrl_responses.RegisterLockResponse;
 import com.crib.server.common.entities.Lock;
 import com.crib.server.common.enums.CtrlResponseStatus;
 import com.crib.server.common.enums.LockType;
 import com.crib.server.common.patterns.CtrlResponse;
 import com.crib.server.common.patterns.RepoResponse;
-import com.crib.server.common.ctrl_requests.RegisterLockRequest;
-import com.crib.server.common.ctrl_responses.RegisterLockResponse;
 import com.crib.server.repositories.RepositoryFactory;
 import com.crib.server.repositories.interfaces.ILockRepository;
 

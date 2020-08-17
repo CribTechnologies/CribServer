@@ -4,11 +4,12 @@ import com.crib.server.common.ctrl_requests.RegisterLockRequest;
 import com.crib.server.common.ctrl_responses.RegisterLockResponse;
 import com.crib.server.common.enums.LockType;
 import com.crib.server.common.patterns.CtrlResponse;
-import com.crib.server.services.LockService;
 import com.crib.server.services.ServiceFactory;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 
-import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
