@@ -1,18 +1,16 @@
 package com.crib.server.controllers;
 
+import com.crib.server.common.ctrl_requests.EmailRegisteredRequest;
 import com.crib.server.common.ctrl_requests.SignInRequest;
 import com.crib.server.common.ctrl_requests.SignUpRequest;
+import com.crib.server.common.ctrl_responses.EmailRegisteredResponse;
 import com.crib.server.common.ctrl_responses.SignInResponse;
 import com.crib.server.common.ctrl_responses.SignUpResponse;
-import com.crib.server.common.patterns.CtrlResponseWP;
 import com.crib.server.services.ServiceFactory;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.constraints.Email;
-import javax.validation.constraints.NotNull;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -33,9 +31,9 @@ public class AuthController {
     }
 
     @PostMapping("/emailisregistered")
-    public CtrlResponseWP<Boolean> emailIsRegistered(@RequestBody @NotNull @Email String email) {
+    public EmailRegisteredResponse emailIsRegistered(EmailRegisteredRequest request) {
         return ServiceFactory.getInstance()
                 .getAuthService()
-                .emailIsRegistered(email);
+                .emailIsRegistered(request);
     }
 }

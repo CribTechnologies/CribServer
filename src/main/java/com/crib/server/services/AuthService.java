@@ -2,13 +2,14 @@ package com.crib.server.services;
 
 import com.crib.server.Argon2Setup;
 import com.crib.server.JSONWebTokenSetup;
+import com.crib.server.common.ctrl_requests.EmailRegisteredRequest;
 import com.crib.server.common.ctrl_requests.SignInRequest;
 import com.crib.server.common.ctrl_requests.SignUpRequest;
+import com.crib.server.common.ctrl_responses.EmailRegisteredResponse;
 import com.crib.server.common.ctrl_responses.SignInResponse;
 import com.crib.server.common.ctrl_responses.SignUpResponse;
 import com.crib.server.common.entities.User;
 import com.crib.server.common.enums.CtrlResponseStatus;
-import com.crib.server.common.patterns.CtrlResponseWP;
 import com.crib.server.common.patterns.RepoResponse;
 import com.crib.server.common.patterns.RepoResponseWP;
 import com.crib.server.repositories.RepositoryFactory;
@@ -116,8 +117,20 @@ public class AuthService extends Service {
         return response;
     }
 
-    public CtrlResponseWP<Boolean> emailIsRegistered(String email) {
-        RepoResponseWP<User> repoResponse = userRepository.getUserByEmail(email);
-        return repoToCtrlResponseWithCustomPayload(repoResponse, repoResponse.getPayload() == null);
+    public EmailRegisteredResponse emailIsRegistered(EmailRegisteredRequest request) {
+        EmailRegisteredResponse response = new EmailRegisteredResponse();
+        if (ValidationHelper.addValidationErrorsToResponse(request, response)) {
+            return response;
+        }
+
+        RepoResponseWP<User> repoResponse = userRepository.getUserByEmail(request.getEmail());
+        if (repoResponse.isSuccessful()) {
+            response.setRegistered(repoResponse == null);
+        }
+        else {
+            response.setStatus(CtrlResponseStatus.REPOSITORY_ERROR);
+            response.addMessage(repoResponse.getMessage());
+        }
+        return response;
     }
 }

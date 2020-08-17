@@ -22,7 +22,7 @@ public class SignUpRequest extends CtrlRequest {
 
     @NotNull
     @Email
-    @NotBlank
+    @Size(min = 1, max = 1024)
     private String email;
 
     @NotNull
