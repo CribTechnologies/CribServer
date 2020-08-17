@@ -3,6 +3,7 @@ package com.crib.server.common.ctrl_requests;
 import com.crib.server.common.patterns.CtrlRequest;
 
 import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -10,6 +11,7 @@ public class SignInRequest extends CtrlRequest {
 
     @NotNull
     @Email
+    @NotBlank
     private String email;
 
     @NotNull

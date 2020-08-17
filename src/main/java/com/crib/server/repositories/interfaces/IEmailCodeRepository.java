@@ -1,7 +1,7 @@
 package com.crib.server.repositories.interfaces;
 
-import com.crib.server.common.entities.EmailVerificationCode;
+import com.crib.server.common.entities.EmailCode;
 import com.crib.server.repositories.IRepository;
 
-public interface IEmailVerificationCodeRepository extends IRepository<EmailVerificationCode> {
+public interface IEmailCodeRepository extends IRepository<EmailCode> {
 }

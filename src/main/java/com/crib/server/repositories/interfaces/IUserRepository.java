@@ -11,7 +11,6 @@ import java.util.Date;
 public interface IUserRepository extends IRepository<User> {
 
     RepoResponseWP<User> getUserByEmail(String email);
-    RepoResponseWP<User> getUserByEmailAndPasswordHash(String email, String passwordHash);
 
     RepoResponse updateFirstAndLastName(String id, String firstName, String lastName);
     RepoResponse updateEmailAndVerified(String id, String email, boolean verified);

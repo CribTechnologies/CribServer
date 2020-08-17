@@ -1,17 +1,17 @@
 package com.crib.server.repositories.implementations.firestore;
 
-import com.crib.server.common.entities.EmailVerificationCode;
+import com.crib.server.common.entities.EmailCode;
 import com.crib.server.repositories.FirestoreRepository;
-import com.crib.server.repositories.interfaces.IEmailVerificationCodeRepository;
+import com.crib.server.repositories.interfaces.IEmailCodeRepository;
 
-public class EmailVerificationCodeRepository extends FirestoreRepository<EmailVerificationCode> implements IEmailVerificationCodeRepository {
+public class EmailCodeRepository extends FirestoreRepository<EmailCode> implements IEmailCodeRepository {
 
-    public EmailVerificationCodeRepository() {
+    public EmailCodeRepository() {
         super("email-verification-codes");
     }
 
     @Override
-    protected Class<EmailVerificationCode> getDTOClass() {
-        return EmailVerificationCode.class;
+    protected Class<EmailCode> getDTOClass() {
+        return EmailCode.class;
     }
 }

@@ -2,12 +2,12 @@ package com.crib.server.common.entities;
 
 import com.crib.server.common.patterns.DTO;
 
-public class EmailVerificationCode extends DTO {
+public class EmailCode extends DTO {
 
     private String userId;
     private String verificationCode;
 
-    public EmailVerificationCode() {
+    public EmailCode() {
     }
 
     public String getUserId() {

@@ -27,7 +27,7 @@ public class JSONWebTokenSetup {
     public void initialize() throws IOException {
         calendar = Calendar.getInstance();
 
-        BufferedReader bufferedReader = new BufferedReader(new FileReader("./private/jwt-private-key.txt"));
+        BufferedReader bufferedReader = new BufferedReader(new FileReader("/Users/arvind/Documents/Coding/Apps/Crib/CribServer/src/main/java/com/crib/server/private/jwt-private-key.txt"));
         jwtSecretKey = bufferedReader.readLine().getBytes();
     }
 

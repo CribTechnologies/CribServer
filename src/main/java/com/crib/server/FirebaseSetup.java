@@ -14,7 +14,7 @@ public class FirebaseSetup {
     private static FirebaseSetup singleInstance = null;
     private Firestore database;
 
-    private String SERVICE_ACCOUNT_FILE_PATH = "./private/crib-3e0df-firebase-adminsdk-wx1q9-8732702fe7.json";
+    private String SERVICE_ACCOUNT_FILE_PATH = "/Users/arvind/Documents/Coding/Apps/Crib/CribServer/src/main/java/com/crib/server/private/crib-3e0df-firebase-adminsdk-wx1q9-8732702fe7.json";
     private String DATABASE_URL = "https://crib-3e0df.firebaseio.com";
 
     private FirebaseSetup() {
@@ -37,7 +37,7 @@ public class FirebaseSetup {
                 .build();
 
         FirebaseApp.initializeApp(options);
-        Firestore db = FirestoreClient.getFirestore();
+        database = FirestoreClient.getFirestore();
     }
 
     public Firestore getDatabase() {

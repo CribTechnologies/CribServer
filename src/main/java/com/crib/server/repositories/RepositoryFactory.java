@@ -1,10 +1,10 @@
 package com.crib.server.repositories;
 
-import com.crib.server.repositories.implementations.firestore.EmailVerificationCodeRepository;
+import com.crib.server.repositories.implementations.firestore.EmailCodeRepository;
 import com.crib.server.repositories.implementations.firestore.HomeRepository;
 import com.crib.server.repositories.implementations.firestore.LockRepository;
 import com.crib.server.repositories.implementations.firestore.UserRepository;
-import com.crib.server.repositories.interfaces.IEmailVerificationCodeRepository;
+import com.crib.server.repositories.interfaces.IEmailCodeRepository;
 import com.crib.server.repositories.interfaces.IHomeRepository;
 import com.crib.server.repositories.interfaces.ILockRepository;
 import com.crib.server.repositories.interfaces.IUserRepository;
@@ -15,13 +15,13 @@ public class RepositoryFactory {
     private final IUserRepository userRepository;
     private final ILockRepository lockRepository;
     private final IHomeRepository homeRepository;
-    private final IEmailVerificationCodeRepository emailVerificationCodeRepository;
+    private final IEmailCodeRepository emailVerificationCodeRepository;
 
     private RepositoryFactory() {
         userRepository = new UserRepository();
         lockRepository = new LockRepository();
         homeRepository = new HomeRepository();
-        emailVerificationCodeRepository = new EmailVerificationCodeRepository();
+        emailVerificationCodeRepository = new EmailCodeRepository();
     }
 
     public static RepositoryFactory getInstance() {
@@ -42,7 +42,7 @@ public class RepositoryFactory {
         return homeRepository;
     }
 
-    public IEmailVerificationCodeRepository getEmailVerificationCodeRepository() {
+    public IEmailCodeRepository getEmailVerificationCodeRepository() {
         return emailVerificationCodeRepository;
     }
 }

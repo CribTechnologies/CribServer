@@ -6,9 +6,11 @@ import com.crib.server.common.patterns.RepoResponse;
 import com.crib.server.common.patterns.RepoResponseWP;
 import com.crib.server.repositories.FirestoreRepository;
 import com.crib.server.repositories.interfaces.IUserRepository;
+import com.google.cloud.firestore.QueryDocumentSnapshot;
 
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class UserRepository extends FirestoreRepository<User> implements IUserRepository {
@@ -26,39 +28,18 @@ public class UserRepository extends FirestoreRepository<User> implements IUserRe
     public RepoResponseWP<User> getUserByEmail(String email) {
         RepoResponseWP<User> response = new RepoResponseWP<>();
         try {
-            User user = getCollectionRef()
+            List<QueryDocumentSnapshot> user = getCollectionRef()
                     .whereEqualTo("email", email)
                     .get()
                     .get()
-                    .getDocuments()
-                    .get(0)
-                    .toObject(getDTOClass());
+                    .getDocuments();
 
+            if (!user.isEmpty()) {
+                response.setPayload(user
+                        .get(0)
+                        .toObject(getDTOClass()));
+            }
             response.setSuccessful(true);
-            response.setPayload(user);
-        }
-        catch (Exception e) {
-            response.setSuccessful(false);
-            response.setMessage(e.getMessage());
-        }
-        return response;
-    }
-
-    @Override
-    public RepoResponseWP<User> getUserByEmailAndPasswordHash(String email, String passwordHash) {
-        RepoResponseWP<User> response = new RepoResponseWP<>();
-        try {
-            User user = getCollectionRef()
-                    .whereEqualTo("email", email)
-                    .whereEqualTo("passwordHash", passwordHash)
-                    .get()
-                    .get()
-                    .getDocuments()
-                    .get(0)
-                    .toObject(getDTOClass());
-
-            response.setSuccessful(true);
-            response.setPayload(user);
         }
         catch (Exception e) {
             response.setSuccessful(false);

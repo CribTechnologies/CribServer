@@ -8,6 +8,7 @@ import com.crib.server.services.LockService;
 import com.crib.server.services.ServiceFactory;
 import org.springframework.web.bind.annotation.*;
 
+import javax.annotation.PostConstruct;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 
@@ -15,27 +16,26 @@ import javax.validation.constraints.Size;
 @RequestMapping("/api/lock")
 public class LockController {
 
-    private LockService lockService;
-
-    public LockController() {
-        ServiceFactory serviceFactory = ServiceFactory.getInstance();
-        lockService = serviceFactory.getLockService();
-    }
-
     @PostMapping("/register")
     public RegisterLockResponse registerLock(@RequestBody RegisterLockRequest request) {
-        return lockService.registerLock(request);
+        return ServiceFactory.getInstance()
+                .getLockService()
+                .registerLock(request);
     }
 
     @PostMapping("/updateLock/name")
     public CtrlResponse updateLockName(@RequestBody @NotNull @Size(min = 1, max = 128) String lockId,
                                        @RequestBody @NotNull @Size(min = 1, max = 128) String name) {
-        return lockService.updateName(lockId, name);
+        return ServiceFactory.getInstance()
+                .getLockService()
+                .updateName(lockId, name);
     }
 
     @PostMapping("/updateLock/type")
     public CtrlResponse updateLockType(@RequestBody @NotNull @Size(min = 1, max = 128) String lockId,
                                        @RequestBody @NotNull LockType lockType) {
-        return lockService.updateLockType(lockId, lockType);
+        return ServiceFactory.getInstance()
+                .getLockService()
+                .updateLockType(lockId, lockType);
     }
 }

@@ -2,7 +2,7 @@ package com.crib.server.services;
 
 import com.crib.server.Argon2Setup;
 import com.crib.server.JSONWebTokenSetup;
-import com.crib.server.common.entities.EmailVerificationCode;
+import com.crib.server.common.entities.EmailCode;
 import com.crib.server.common.entities.User;
 import com.crib.server.common.enums.CtrlResponseStatus;
 import com.crib.server.common.patterns.CtrlResponseWP;
@@ -14,6 +14,7 @@ import com.crib.server.common.ctrl_responses.SignInResponse;
 import com.crib.server.common.ctrl_responses.SignUpResponse;
 import com.crib.server.repositories.RepositoryFactory;
 import com.crib.server.repositories.interfaces.IUserRepository;
+import com.crib.server.services.helpers.ValidationHelper;
 
 import java.util.Date;
 import java.util.UUID;
@@ -35,6 +36,10 @@ public class AuthService extends Service {
 
     public SignInResponse signIn(SignInRequest request) {
         SignInResponse response = new SignInResponse();
+        if (ValidationHelper.addValidationErrorsToResponse(request, response)) {
+            return response;
+        }
+
         RepoResponseWP<User> repositoryResponse = userRepository.getUserByEmail(request.getEmail());
         User user = repositoryResponse.getPayload();
         if (!repositoryResponse.isSuccessful()) {
@@ -60,6 +65,10 @@ public class AuthService extends Service {
 
     public SignUpResponse signUp(SignUpRequest request) {
         SignUpResponse response = new SignUpResponse();
+        if (ValidationHelper.addValidationErrorsToResponse(request, response)) {
+            return response;
+        }
+
         RepoResponseWP<User> repositoryResponse1 = userRepository.getUserByEmail(request.getEmail());
         if (repositoryResponse1.getPayload() != null) {
             response.setStatus(CtrlResponseStatus.VALIDATION_ERROR);
@@ -83,26 +92,27 @@ public class AuthService extends Service {
         user.setTimestamp(new Date().getTime());
         user.setPasswordHash(argon2.createHash(request.getPassword()));
 
-        EmailVerificationCode code = new EmailVerificationCode();
-        code.setUserId(UUID.randomUUID().toString());
-        code.setTimestamp(new Date().getTime());
-        code.setUserId(user.getId());
-
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 128; i++) {
-            int random = (int) Math.floor(Math.random() * alphanumeric.length());
-            sb.append(alphanumeric.charAt(random));
-        }
-        code.setVerificationCode(sb.toString());
+//        EmailCode code = new EmailCode();
+//        code.setUserId(UUID.randomUUID().toString());
+//        code.setTimestamp(new Date().getTime());
+//        code.setUserId(user.getId());
+//
+//        StringBuilder sb = new StringBuilder();
+//        for (int i = 0; i < 128; i++) {
+//            int random = (int) Math.floor(Math.random() * alphanumeric.length());
+//            sb.append(alphanumeric.charAt(random));
+//        }
+//        code.setVerificationCode(sb.toString());
 
         RepoResponse repoResponse2 = userRepository.create(user);
         if (repoResponse2.isSuccessful()) {
-            response.setStatus(CtrlResponseStatus.ERROR);
-            response.addMessage(repoResponse2.getMessage());
-        }
-        else {
             response.setStatus(CtrlResponseStatus.SUCCESS);
             response.setUserId(user.getId());
+            response.setAuthenticationToken(jwt.generateSignInToken(user.getId()));
+        }
+        else {
+            response.setStatus(CtrlResponseStatus.ERROR);
+            response.addMessage(repoResponse2.getMessage());
         }
         return response;
     }
