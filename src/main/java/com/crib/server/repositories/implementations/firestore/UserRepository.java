@@ -49,6 +49,11 @@ public class UserRepository extends FirestoreRepository<User> implements IUserRe
     }
 
     @Override
+    public RepoResponse setEmailVerifiedToTrue(String userId) {
+        return updateField(userId, "emailVerified", true);
+    }
+
+    @Override
     public RepoResponse updateFirstAndLastName(String id, String firstName, String lastName) {
         Map<String, Object> fields = new HashMap<>();
         fields.put("firstName", firstName);

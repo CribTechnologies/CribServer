@@ -6,9 +6,11 @@ import com.crib.server.JSONWebTokenSetup;
 import com.crib.server.common.ctrl_requests.EmailRegisteredRequest;
 import com.crib.server.common.ctrl_requests.SignInRequest;
 import com.crib.server.common.ctrl_requests.SignUpRequest;
+import com.crib.server.common.ctrl_requests.VerifyEmailRequest;
 import com.crib.server.common.ctrl_responses.EmailRegisteredResponse;
 import com.crib.server.common.ctrl_responses.SignInResponse;
 import com.crib.server.common.ctrl_responses.SignUpResponse;
+import com.crib.server.common.ctrl_responses.VerifyEmailResponse;
 import com.crib.server.common.entities.EmailCode;
 import com.crib.server.common.entities.User;
 import com.crib.server.common.enums.CtrlResponseStatus;
@@ -127,7 +129,7 @@ public class AuthService extends Service {
             String emailBody = String.format(
                     "Welcome to Crib, %s!\n\nTo continue registration for your account, click this link to verify your email: %s",
                     user.getFirstName() + " " + user.getLastName(),
-                    envVariables.BASE_URL + "verifyemail?code=" + generatedCode + "&userId=" + user.getId()
+                    envVariables.BASE_URL + "api/auth/verifyemail?code=" + generatedCode + "&userId=" + user.getId()
             );
             emailHelper.sendEmail(user.getEmail(), "Crib: Verify your email", emailBody);
         });
@@ -169,11 +171,39 @@ public class AuthService extends Service {
 
         RepoResponseWP<User> repoResponse = userRepository.getUserByEmail(request.getEmail());
         if (repoResponse.isSuccessful()) {
-            response.setRegistered(repoResponse == null);
+            response.setRegistered(repoResponse.getPayload() != null);
         }
         else {
             response.setStatus(CtrlResponseStatus.REPOSITORY_ERROR);
             response.addMessage(repoResponse.getMessage());
+        }
+        return response;
+    }
+
+    public VerifyEmailResponse verifyEmail(VerifyEmailRequest request) {
+        VerifyEmailResponse response = new VerifyEmailResponse();
+        if (ValidationHelper.addValidationErrorsToResponse(request, response)) {
+            return response;
+        }
+
+        RepoResponseWP<EmailCode> repoResponse = emailCodeRepository.getEmailCodeByCode(request.getCode());
+        if (repoResponse.getPayload() == null) {
+            response.setVerified(false);
+            response.addMessage("This code does not exist!");
+        }
+        else if (repoResponse.getPayload().getUserId() != request.getUserId()) {
+            response.setVerified(false);
+            response.addMessage("The code and userId do not match!");
+        }
+        else {
+            RepoResponse repoResponse2 = userRepository.setEmailVerifiedToTrue(request.getUserId());
+            if (repoResponse.isSuccessful()) {
+                response.setVerified(true);
+            }
+            else {
+                response.setStatus(CtrlResponseStatus.REPOSITORY_ERROR);
+                response.addMessage(repoResponse2.getMessage());
+            }
         }
         return response;
     }

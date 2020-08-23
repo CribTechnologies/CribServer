@@ -12,6 +12,8 @@ public interface IUserRepository extends IRepository<User> {
 
     RepoResponseWP<User> getUserByEmail(String email);
 
+    RepoResponse setEmailVerifiedToTrue(String userId);
+
     RepoResponse updateFirstAndLastName(String id, String firstName, String lastName);
     RepoResponse updateEmailAndVerified(String id, String email, boolean verified);
     RepoResponse updatePasswordHash(String id, String passwordHash);
