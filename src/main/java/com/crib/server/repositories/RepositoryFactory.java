@@ -15,13 +15,13 @@ public class RepositoryFactory {
     private final IUserRepository userRepository;
     private final ILockRepository lockRepository;
     private final IHomeRepository homeRepository;
-    private final IEmailCodeRepository emailVerificationCodeRepository;
+    private final IEmailCodeRepository emailCodeRepository;
 
     private RepositoryFactory() {
         userRepository = new UserRepository();
         lockRepository = new LockRepository();
         homeRepository = new HomeRepository();
-        emailVerificationCodeRepository = new EmailCodeRepository();
+        emailCodeRepository = new EmailCodeRepository();
     }
 
     public static RepositoryFactory getInstance() {
@@ -42,7 +42,7 @@ public class RepositoryFactory {
         return homeRepository;
     }
 
-    public IEmailCodeRepository getEmailVerificationCodeRepository() {
-        return emailVerificationCodeRepository;
+    public IEmailCodeRepository getEmailCodeRepository() {
+        return emailCodeRepository;
     }
 }

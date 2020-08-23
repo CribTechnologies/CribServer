@@ -1,37 +1,56 @@
 package com.crib.server.services.helpers;
 
-import org.simplejavamail.api.email.Email;
-import org.simplejavamail.api.mailer.Mailer;
-import org.simplejavamail.api.mailer.config.TransportStrategy;
-import org.simplejavamail.email.EmailBuilder;
-import org.simplejavamail.mailer.MailerBuilder;
+import com.crib.server.EnvVariables;
+
+import javax.mail.*;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import java.util.Properties;
 
 public class EmailHelper {
 
-    private static Mailer mailer;
+    private static EmailHelper singleInstance;
+    private EnvVariables envVariables;
+    private Session session;
 
-    private static String senderEmail;
-    private static String senderName;
+    private EmailHelper() {
+        envVariables = EnvVariables.getInstance();
 
-    static {
-        senderEmail = "crib@gmail.com";
-        senderName = "Crib";
+        Properties props = System.getProperties();
 
-        mailer = MailerBuilder
-                .withSMTPServer("smtp.gmail.com", 25, senderEmail, "PASSWORD")
-                .withTransportStrategy(TransportStrategy.SMTP_TLS)
-                .buildMailer();
+        props.put("mail.smtp.host", "smtp.gmail.com");
+        props.put("mail.smtp.port", "465");
+        props.put("mail.smtp.ssl.enable", "true");
+        props.put("mail.smtp.auth", "true");
+
+        session = Session.getInstance(props, new Authenticator() {
+            @Override
+            protected PasswordAuthentication getPasswordAuthentication() {
+                return new PasswordAuthentication(envVariables.EMAIL, envVariables.PASSWORD);
+            }
+        });
+        session.setDebug(false);
     }
 
-    public static void sendPlainTextEmail(String toName, String toEmail, String subject, String message) {
-        Email email = EmailBuilder
-                .startingBlank()
-                .from(senderName, senderEmail)
-                .to(toName, toEmail)
-                .withSubject(subject)
-                .withPlainText(message)
-                .buildEmail();
+    public static EmailHelper getInstance() {
+        if (singleInstance == null)
+            singleInstance = new EmailHelper();
+        return singleInstance;
+    }
 
-        mailer.sendMail(email);
+    public boolean sendEmail(String toEmail, String subject, String message) {
+        try {
+            MimeMessage msg = new MimeMessage(session);
+            msg.setFrom(new InternetAddress(envVariables.EMAIL));
+            msg.addRecipient(Message.RecipientType.TO, new InternetAddress(toEmail));
+            msg.setSubject(subject);
+            msg.setText(message);
+            Transport.send(msg);
+            return true;
+        }
+        catch (MessagingException e) {
+            e.printStackTrace();
+            return false;
+        }
     }
 }

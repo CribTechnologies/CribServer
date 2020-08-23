@@ -15,6 +15,7 @@ import com.crib.server.common.enums.CtrlResponseStatus;
 import com.crib.server.common.patterns.RepoResponse;
 import com.crib.server.common.patterns.RepoResponseWP;
 import com.crib.server.repositories.RepositoryFactory;
+import com.crib.server.repositories.interfaces.IEmailCodeRepository;
 import com.crib.server.repositories.interfaces.IUserRepository;
 import com.crib.server.services.helpers.EmailHelper;
 import com.crib.server.services.helpers.StringGeneratorHelper;
@@ -22,18 +23,27 @@ import com.crib.server.services.helpers.ValidationHelper;
 
 import java.util.Date;
 import java.util.UUID;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class AuthService extends Service {
 
     private IUserRepository userRepository;
+    private IEmailCodeRepository emailCodeRepository;
+    private EnvVariables envVariables;
     private Argon2Setup argon2;
     private JSONWebTokenSetup jwt;
+    private EmailHelper emailHelper;
 
     public AuthService() {
         RepositoryFactory repositoryFactory = RepositoryFactory.getInstance();
+        envVariables = EnvVariables.getInstance();
         userRepository = repositoryFactory.getUserRepository();
+        emailCodeRepository = repositoryFactory.getEmailCodeRepository();
         argon2 = Argon2Setup.getInstance();
         jwt = JSONWebTokenSetup.getInstance();
+        emailHelper = EmailHelper.getInstance();
     }
 
     public SignInResponse signIn(SignInRequest request) {
@@ -81,7 +91,7 @@ public class AuthService extends Service {
         User user = new User();
         user.setFirstName(request.getFirstName());
         user.setLastName(request.getLastName());
-        user.setEmail(request.getEmail());
+        user.setEmail(request.getEmail().toLowerCase());
         user.setDateOfBirth(request.getDateOfBirth());
         user.setPhoneNumber(request.getPhoneNumber());
         user.setGender(request.getGender());
@@ -94,30 +104,59 @@ public class AuthService extends Service {
         user.setTimestamp(new Date().getTime());
         user.setPasswordHash(argon2.createHash(request.getPassword()));
 
-        // Generate email code and send email
+        // Generate email code
         EmailCode code = new EmailCode();
-        code.setUserId(UUID.randomUUID().toString());
+        code.setId(UUID.randomUUID().toString());
         code.setTimestamp(new Date().getTime());
         code.setUserId(user.getId());
 
         String generatedCode = StringGeneratorHelper.generateRandomString(128);
         code.setCodeHash(argon2.createHash(generatedCode));
 
-        EmailHelper.sendPlainTextEmail(user.getFirstName() + " " + user.getLastName(), user.getEmail(),
-                "Crib: Verify your email",
-                "We are so excited to have you, " + user.getFirstName() + " " + user.getLastName() + "! Before you continue," +
-                        "you must verify your email. Click this link to do so: " +
-                        EnvVariables.BASE_URL + "verifyemail?code=" + generatedCode + "&userId=" + user.getId());
+        // Run 3 threads
+        // Thread 1: create user
+        // Thread 2: create email code
+        // Thread 3: send email code
+        AtomicReference<RepoResponse> createUserResp = new AtomicReference<>();
+        Thread createUser = new Thread(() -> createUserResp.set(userRepository.create(user)));
 
-        RepoResponse repoResponse2 = userRepository.create(user);
-        if (repoResponse2.isSuccessful()) {
+        AtomicReference<RepoResponse> createEmailCodeResp = new AtomicReference<>();
+        Thread createEmailCode = new Thread(() -> createEmailCodeResp.set(emailCodeRepository.create(code)));
+
+        Thread sendEmailCode = new Thread(() -> {
+            String emailBody = String.format(
+                    "Welcome to Crib, %s!\n\nTo continue registration for your account, click this link to verify your email: %s",
+                    user.getFirstName() + " " + user.getLastName(),
+                    envVariables.BASE_URL + "verifyemail?code=" + generatedCode + "&userId=" + user.getId()
+            );
+            emailHelper.sendEmail(user.getEmail(), "Crib: Verify your email", emailBody);
+        });
+
+        // Run threads in parallel
+        createUser.start();
+        createEmailCode.start();
+        sendEmailCode.start();
+        try {
+            createUser.join();
+            createEmailCode.join();
+        }
+        catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        // Error handling
+        if (!createUserResp.get().isSuccessful()) {
+            response.setStatus(CtrlResponseStatus.REPOSITORY_ERROR);
+            response.addMessage(createUserResp.get().getMessage());
+        }
+        if (!createEmailCodeResp.get().isSuccessful()) {
+            response.setStatus(CtrlResponseStatus.REPOSITORY_ERROR);
+            response.addMessage(createEmailCodeResp.get().getMessage());
+        }
+        if (response.getMessages().isEmpty()) {
             response.setStatus(CtrlResponseStatus.SUCCESS);
             response.setUserId(user.getId());
             response.setAuthenticationToken(jwt.generateSignInToken(user.getId()));
-        }
-        else {
-            response.setStatus(CtrlResponseStatus.ERROR);
-            response.addMessage(repoResponse2.getMessage());
         }
         return response;
     }
