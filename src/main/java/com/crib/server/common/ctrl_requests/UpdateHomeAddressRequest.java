@@ -14,10 +14,6 @@ public class UpdateHomeAddressRequest extends CtrlRequest {
 
     @NotNull
     @Size(min = 1, max = 128)
-    private String userAccessorId;
-
-    @NotNull
-    @Size(min = 1, max = 128)
     private String addressPrimaryStreet;
 
     @Max(value = 128)
@@ -48,14 +44,6 @@ public class UpdateHomeAddressRequest extends CtrlRequest {
 
     public void setHomeId(String homeId) {
         this.homeId = homeId;
-    }
-
-    public String getUserAccessorId() {
-        return userAccessorId;
-    }
-
-    public void setUserAccessorId(String userAccessorId) {
-        this.userAccessorId = userAccessorId;
     }
 
     public String getAddressPrimaryStreet() {

@@ -1,7 +1,7 @@
 package com.crib.server.services;
 
-import com.crib.server.common.ctrl_requests.CreateHomeRequest;
-import com.crib.server.common.ctrl_requests.UpdateHomeAddressRequest;
+import com.crib.server.common.ctrl_requests.*;
+import com.crib.server.common.ctrl_responses.HomeResponse;
 import com.crib.server.common.ctrl_responses.ViewHomeDetailsResponse;
 import com.crib.server.common.entities.Home;
 import com.crib.server.common.entities.Lock;
@@ -9,7 +9,6 @@ import com.crib.server.common.entities.User;
 import com.crib.server.common.enums.CtrlResponseStatus;
 import com.crib.server.common.enums.UserHomeRole;
 import com.crib.server.common.patterns.CtrlResponse;
-import com.crib.server.common.patterns.CtrlResponseWP;
 import com.crib.server.common.patterns.RepoResponse;
 import com.crib.server.common.patterns.RepoResponseWP;
 import com.crib.server.common.value_objects.PhysicalAddress;
@@ -18,11 +17,12 @@ import com.crib.server.repositories.RepositoryFactory;
 import com.crib.server.repositories.interfaces.IHomeRepository;
 import com.crib.server.repositories.interfaces.ILockRepository;
 import com.crib.server.repositories.interfaces.IUserRepository;
+import com.crib.server.services.helpers.IdHelper;
+import com.crib.server.services.helpers.ValidationHelper;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -35,11 +35,14 @@ public class HomeService extends Service {
     private final ILockRepository lockRepository;
     private final IUserRepository userRepository;
 
+    private final IdHelper idHelper;
+
     public HomeService() {
         RepositoryFactory repositoryFactory = RepositoryFactory.getInstance();
         homeRepository = repositoryFactory.getHomeRepository();
         lockRepository = repositoryFactory.getLockRepository();
         userRepository = repositoryFactory.getUserRepository();
+        idHelper = IdHelper.getInstance();
     }
 
     // Reused private methods
@@ -54,8 +57,8 @@ public class HomeService extends Service {
     }
 
     // Public methods
-    public CtrlResponseWP<Home> createHome(CreateHomeRequest request) {
-        CtrlResponseWP<Home> ctrlResponseWP = new CtrlResponseWP<>();
+    public HomeResponse createHome(CreateHomeRequest request) {
+        HomeResponse response = new HomeResponse();
 
         PhysicalAddress address = new PhysicalAddress();
         address.setPrimaryStreet(request.getAddressPrimaryStreet());
@@ -75,7 +78,7 @@ public class HomeService extends Service {
         address.setFullAddress(fullAddress);
 
         Home home = new Home();
-        home.setId(UUID.randomUUID().toString());
+        home.setId(idHelper.generateId());
         home.setTimestamp(new Date().getTime());
         home.setName(request.getHomeName());
         home.setLockIds(new ArrayList<>());
@@ -90,24 +93,42 @@ public class HomeService extends Service {
 
         RepoResponse repoResponse = homeRepository.create(home);
         if (repoResponse.isSuccessful()) {
-            ctrlResponseWP.setStatus(CtrlResponseStatus.SUCCESS);
-            ctrlResponseWP.setPayload(home);
+            response.setStatus(CtrlResponseStatus.SUCCESS);
+            response.setHome(home);
         }
         else {
-            ctrlResponseWP.setStatus(CtrlResponseStatus.REPOSITORY_ERROR);
-            ctrlResponseWP.addMessage(repoResponse.getMessage());
+            response.setStatus(CtrlResponseStatus.REPOSITORY_ERROR);
+            response.addMessage(repoResponse.getMessage());
         }
-        return ctrlResponseWP;
+        return response;
     }
 
-    public CtrlResponseWP<Home> getHomeById(String homeId, String userAccessorId) {
-        return repoToCtrlResponseWithPayload(homeRepository.getById(homeId));
+    public HomeResponse getHomeById(HomeIdRequest request) {
+        HomeResponse response = new HomeResponse();
+        if (ValidationHelper.addValidationErrorsToResponse(request, response)) {
+            return response;
+        }
+
+        RepoResponseWP<Home> repoResponse = homeRepository.getById(request.getHomeId());
+        if (repoResponse.isSuccessful()) {
+            response.setStatus(CtrlResponseStatus.SUCCESS);
+            response.setHome(repoResponse.getPayload());
+        }
+        else {
+            response.setStatus(CtrlResponseStatus.REPOSITORY_ERROR);
+            response.addMessage(repoResponse.getMessage());
+        }
+        return response;
     }
 
-    public ViewHomeDetailsResponse getHomeDetails(String homeId, String userAccessorId) {
+    public ViewHomeDetailsResponse getHomeDetails(HomeIdRequest request) {
         ViewHomeDetailsResponse response = new ViewHomeDetailsResponse();
+        if (ValidationHelper.addValidationErrorsToResponse(request, response)) {
+            return response;
+        }
+
         try {
-            RepoResponseWP<Home> repoResponseWP = homeRepository.getById(homeId);
+            RepoResponseWP<Home> repoResponseWP = homeRepository.getById(request.getHomeId());
             Home home = repoResponseWP.getPayload();
 
             AtomicReference<RepoResponseWP<List<User>>> getUsersResponseRef = new AtomicReference<>();
@@ -143,47 +164,133 @@ public class HomeService extends Service {
         return response;
     }
 
-    public CtrlResponse deleteHomeById(String homeId, String userAccessorId) {
-        return repoToCtrlResponse(homeRepository.delete(homeId));
+    public CtrlResponse deleteHomeById(HomeIdRequest request) {
+        CtrlResponse response = new CtrlResponse();
+        if (ValidationHelper.addValidationErrorsToResponse(request, response)) {
+            return response;
+        }
+        RepoResponse repoResponse = homeRepository.delete(request.getHomeId());
+        if (repoResponse.isSuccessful()) {
+            response.setStatus(CtrlResponseStatus.SUCCESS);
+        }
+        else {
+            response.setStatus(CtrlResponseStatus.REPOSITORY_ERROR);
+            response.addMessage(repoResponse.getMessage());
+        }
+        return response;
     }
 
-    public CtrlResponse addLockToHome(String homeId, String userAccessorId, String lockId) {
-        return repoToCtrlResponse(homeRepository.addLockToHome(homeId, lockId));
+    public CtrlResponse addLockToHome(HomeAndLockIdRequest request) {
+        CtrlResponse response = new CtrlResponse();
+        if (ValidationHelper.addValidationErrorsToResponse(request, response)) {
+            return response;
+        }
+        RepoResponse repoResponse = homeRepository.addLockToHome(request.getHomeId(), request.getLockId());
+        if (repoResponse.isSuccessful()) {
+            response.setStatus(CtrlResponseStatus.SUCCESS);
+        }
+        else {
+            response.setStatus(CtrlResponseStatus.REPOSITORY_ERROR);
+            response.addMessage(repoResponse.getMessage());
+        }
+        return response;
     }
 
-    public CtrlResponse removeLockFromHome(String homeId, String userAccessorId, String lockId) {
-        return repoToCtrlResponse(homeRepository.removeLockFromHome(homeId, lockId));
+    public CtrlResponse removeLockFromHome(HomeAndLockIdRequest request) {
+        CtrlResponse response = new CtrlResponse();
+        if (ValidationHelper.addValidationErrorsToResponse(request, response)) {
+            return response;
+        }
+        RepoResponse repoResponse = homeRepository.removeLockFromHome(request.getHomeId(), request.getLockId());
+        if (repoResponse.isSuccessful()) {
+            response.setStatus(CtrlResponseStatus.SUCCESS);
+        }
+        else {
+            response.setStatus(CtrlResponseStatus.REPOSITORY_ERROR);
+            response.addMessage(repoResponse.getMessage());
+        }
+        return response;
     }
 
-    public CtrlResponse addUserWithRole(String homeId, String userAccessorId, String userId, UserHomeRole role) {
+    public CtrlResponse addUserWithRole(RoleChangeRequest request) {
+        CtrlResponse response = new CtrlResponse();
+        if (ValidationHelper.addValidationErrorsToResponse(request, response)) {
+            return response;
+        }
         UserIdWithRole uiwr = new UserIdWithRole();
-        uiwr.setUserId(userId);
-        uiwr.setRole(role);
-        return repoToCtrlResponse(homeRepository.addUserWithRole(homeId, uiwr));
+        uiwr.setUserId(request.getUserId());
+        uiwr.setRole(request.getRole());
+
+        RepoResponse repoResponse = homeRepository.addUserWithRole(request.getHomeId(), uiwr);
+        if (repoResponse.isSuccessful()) {
+            response.setStatus(CtrlResponseStatus.SUCCESS);
+        }
+        else {
+            response.setStatus(CtrlResponseStatus.REPOSITORY_ERROR);
+            response.addMessage(repoResponse.getMessage());
+        }
+        return response;
     }
 
-    public CtrlResponse removeUserWithRole(String homeId, String userAccessorId, String userId, UserHomeRole role) {
+    public CtrlResponse removeUserWithRole(RoleChangeRequest request) {
+        CtrlResponse response = new CtrlResponse();
+        if (ValidationHelper.addValidationErrorsToResponse(request, response)) {
+            return response;
+        }
         UserIdWithRole uiwr = new UserIdWithRole();
-        uiwr.setUserId(userId);
-        uiwr.setRole(role);
-        return repoToCtrlResponse(homeRepository.removeUserWithRole(homeId, uiwr));
+        uiwr.setUserId(request.getUserId());
+        uiwr.setRole(request.getRole());
+
+        RepoResponse repoResponse = homeRepository.removeUserWithRole(request.getHomeId(), uiwr);
+        if (repoResponse.isSuccessful()) {
+            response.setStatus(CtrlResponseStatus.SUCCESS);
+        }
+        else {
+            response.setStatus(CtrlResponseStatus.REPOSITORY_ERROR);
+            response.addMessage(repoResponse.getMessage());
+        }
+        return response;
     }
 
-    public CtrlResponse changeUserWithRole(String homeId, String userAccessorId, String userId, UserHomeRole role) {
+    public CtrlResponse changeUserWithRole(RoleChangeRequest request) {
+        CtrlResponse response = new CtrlResponse();
+        if (ValidationHelper.addValidationErrorsToResponse(request, response)) {
+            return response;
+        }
         UserIdWithRole uiwr = new UserIdWithRole();
-        uiwr.setUserId(userId);
-        uiwr.setRole(role);
-        return repoToCtrlResponse(homeRepository.changeUserWithRole(homeId, uiwr));
+        uiwr.setUserId(request.getUserId());
+        uiwr.setRole(request.getRole());
+
+        RepoResponse repoResponse = homeRepository.changeUserWithRole(request.getHomeId(), uiwr);
+        if (repoResponse.isSuccessful()) {
+            response.setStatus(CtrlResponseStatus.SUCCESS);
+        }
+        else {
+            response.setStatus(CtrlResponseStatus.REPOSITORY_ERROR);
+            response.addMessage(repoResponse.getMessage());
+        }
+        return response;
     }
 
-    public CtrlResponse updateName(String homeId, String userAccessorId, String name) {
-        return repoToCtrlResponse(homeRepository.updateName(homeId, name));
+    public CtrlResponse updateName(UpdateHomeNameRequest request) {
+        CtrlResponse response = new CtrlResponse();
+        if (ValidationHelper.addValidationErrorsToResponse(request, response)) {
+            return response;
+        }
+
+        RepoResponse repoResponse = homeRepository.updateName(request.getHomeId(), request.getName());
+        if (repoResponse.isSuccessful()) {
+            response.setStatus(CtrlResponseStatus.SUCCESS);
+        }
+        else {
+            response.setStatus(CtrlResponseStatus.REPOSITORY_ERROR);
+            response.addMessage(repoResponse.getMessage());
+        }
+        return response;
     }
 
     // request includes userAccessorId
     public CtrlResponse updateAddress(UpdateHomeAddressRequest request) {
-        String userAccessorId = request.getUserAccessorId();
-
         PhysicalAddress address = new PhysicalAddress();
         address.setPrimaryStreet(request.getAddressPrimaryStreet());
         address.setSecondaryStreet(request.getAddressSecondaryStreet());

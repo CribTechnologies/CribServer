@@ -1,111 +1,87 @@
 package com.crib.server.controllers;
 
-import com.crib.server.common.ctrl_requests.CreateHomeRequest;
-import com.crib.server.common.ctrl_requests.UpdateHomeAddressRequest;
+import com.crib.server.common.ctrl_requests.*;
+import com.crib.server.common.ctrl_responses.HomeResponse;
 import com.crib.server.common.ctrl_responses.ViewHomeDetailsResponse;
-import com.crib.server.common.entities.Home;
-import com.crib.server.common.enums.UserHomeRole;
 import com.crib.server.common.patterns.CtrlResponse;
-import com.crib.server.common.patterns.CtrlResponseWP;
 import com.crib.server.services.ServiceFactory;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.validation.constraints.NotNull;
-import javax.validation.constraints.Size;
-
 @RestController
 @RequestMapping("/api/home")
 public class HomeController {
 
     @PostMapping("/create")
-    public CtrlResponseWP<Home> createHome(@RequestBody CreateHomeRequest request) {
+    public HomeResponse createHome(@RequestBody CreateHomeRequest request) {
         return ServiceFactory.getInstance()
                 .getHomeService()
                 .createHome(request);
     }
 
     @PostMapping("/getById")
-    public CtrlResponseWP<Home> getHomeById(@RequestBody @NotNull @Size(min = 1, max = 128) String homeId,
-                                            @RequestBody @NotNull @Size(min = 1, max = 128) String userAccessorId) {
+    public HomeResponse getHomeById(@RequestBody HomeIdRequest request) {
         return ServiceFactory.getInstance()
                 .getHomeService()
-                .getHomeById(homeId, userAccessorId);
+                .getHomeById(request);
     }
 
     @PostMapping("/getDetails")
-    public ViewHomeDetailsResponse viewHomeDetails(@RequestBody @NotNull @Size(min = 1, max = 128) String homeId,
-                                                   @RequestBody @NotNull @Size(min = 1, max = 128) String userAccessorId) {
+    public ViewHomeDetailsResponse viewHomeDetails(@RequestBody HomeIdRequest request) {
         return ServiceFactory.getInstance()
                 .getHomeService()
-                .getHomeDetails(homeId, userAccessorId);
+                .getHomeDetails(request);
     }
 
     @PostMapping("/delete")
-    public CtrlResponse deleteHomeById(@RequestBody @NotNull @Size(min = 1, max = 128) String homeId,
-                                       @RequestBody @NotNull @Size(min = 1, max = 128) String userAccessorId) {
+    public CtrlResponse deleteHomeById(@RequestBody HomeIdRequest request) {
         return ServiceFactory.getInstance()
                 .getHomeService()
-                .deleteHomeById(homeId, userAccessorId);
+                .deleteHomeById(request);
     }
 
     @PostMapping("/addLock")
-    public CtrlResponse addLockToHome(@RequestBody @NotNull @Size(min = 1, max = 128) String homeId,
-                                      @RequestBody @NotNull @Size(min = 1, max = 128) String userAccessorId,
-                                      @RequestBody @NotNull @Size(min = 1, max = 128) String lockId) {
+    public CtrlResponse addLockToHome(@RequestBody HomeAndLockIdRequest request) {
         return ServiceFactory.getInstance()
                 .getHomeService()
-                .addLockToHome(homeId, userAccessorId, lockId);
+                .addLockToHome(request);
     }
 
     @PostMapping("/removeLock")
-    public CtrlResponse removeLockFromHome(@RequestBody @NotNull @Size(min = 1, max = 128) String homeId,
-                                           @RequestBody @NotNull @Size(min = 1, max = 128) String userAccessorId,
-                                           @RequestBody @NotNull @Size(min = 1, max = 128) String lockId) {
+    public CtrlResponse removeLockFromHome(@RequestBody HomeAndLockIdRequest request) {
         return ServiceFactory.getInstance()
                 .getHomeService()
-                .removeLockFromHome(homeId, userAccessorId, lockId);
+                .removeLockFromHome(request);
     }
 
     @PostMapping("/addMemberRole")
-    public CtrlResponse addUserWithRole(@RequestBody @NotNull @Size(min = 1, max = 128) String homeId,
-                                      @RequestBody @NotNull @Size(min = 1, max = 128) String userAccessorId,
-                                      @RequestBody @NotNull @Size(min = 1, max = 128) String userId,
-                                      @RequestBody @NotNull UserHomeRole role) {
+    public CtrlResponse addUserWithRole(@RequestBody RoleChangeRequest request) {
         return ServiceFactory.getInstance()
                 .getHomeService()
-                .addUserWithRole(homeId, userAccessorId, userId, role);
+                .addUserWithRole(request);
     }
 
     @PostMapping("/removeMemberRole")
-    public CtrlResponse removeUserWithRole(@RequestBody @NotNull @Size(min = 1, max = 128) String homeId,
-                                           @RequestBody @NotNull @Size(min = 1, max = 128) String userAccessorId,
-                                           @RequestBody @NotNull @Size(min = 1, max = 128) String userId,
-                                           @RequestBody @NotNull UserHomeRole role) {
+    public CtrlResponse removeUserWithRole(@RequestBody RoleChangeRequest request) {
         return ServiceFactory.getInstance()
                 .getHomeService()
-                .removeUserWithRole(homeId, userAccessorId, userId, role);
+                .removeUserWithRole(request);
     }
 
     @PostMapping("/changeMemberRole")
-    public CtrlResponse changeUserWithRole(@RequestBody @NotNull @Size(min = 1, max = 128) String homeId,
-                                           @RequestBody @NotNull @Size(min = 1, max = 128) String userAccessorId,
-                                           @RequestBody @NotNull @Size(min = 1, max = 128) String userId,
-                                           @RequestBody @NotNull UserHomeRole role) {
+    public CtrlResponse changeUserWithRole(@RequestBody RoleChangeRequest request) {
         return ServiceFactory.getInstance()
                 .getHomeService()
-                .changeUserWithRole(homeId, userAccessorId, userId, role);
+                .changeUserWithRole(request);
     }
 
     @PostMapping("/updateSettings/name")
-    public CtrlResponse updateName(@RequestBody @NotNull @Size(min = 1, max = 128) String homeId,
-                                   @RequestBody @NotNull @Size(min = 1, max = 128) String userAccessorId,
-                                   @RequestBody @NotNull @Size(min = 1, max = 128) String name) {
+    public CtrlResponse updateName(@RequestBody UpdateHomeNameRequest request) {
         return ServiceFactory.getInstance()
                 .getHomeService()
-                .updateName(homeId, userAccessorId, name);
+                .updateName(request);
     }
 
     @PostMapping("/updateSettings/address")

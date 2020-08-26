@@ -7,14 +7,12 @@ public class ServiceFactory {
     private final UserService userService;
     private final LockService lockService;
     private final HomeService homeService;
-    private final EmailService emailService;
 
     private ServiceFactory() {
         authService = new AuthService();
         userService = new UserService();
         lockService = new LockService();
         homeService = new HomeService();
-        emailService = new EmailService();
     }
 
     public static ServiceFactory getInstance() {
@@ -37,9 +35,5 @@ public class ServiceFactory {
 
     public HomeService getHomeService() {
         return homeService;
-    }
-
-    public EmailService getEmailService() {
-        return emailService;
     }
 }

@@ -54,10 +54,12 @@ public class UserRepository extends FirestoreRepository<User> implements IUserRe
     }
 
     @Override
-    public RepoResponse updateFirstAndLastName(String id, String firstName, String lastName) {
+    public RepoResponse updateDetails(String id, String firstName, String lastName, Date dateOfBirth, Gender gender) {
         Map<String, Object> fields = new HashMap<>();
         fields.put("firstName", firstName);
         fields.put("lastName", lastName);
+        fields.put("dateOfBirth", dateOfBirth);
+        fields.put("gender", gender);
         return updateFields(id, fields);
     }
 
@@ -75,20 +77,10 @@ public class UserRepository extends FirestoreRepository<User> implements IUserRe
     }
 
     @Override
-    public RepoResponse updateDateOfBirth(String id, Date dateOfBirth) {
-        return updateField(id, "dateOfBirth", dateOfBirth);
-    }
-
-    @Override
     public RepoResponse updatePhoneNumberAndVerified(String id, String phoneNumber, boolean verified) {
         Map<String, Object> fields = new HashMap<>();
         fields.put("phoneNumber", phoneNumber);
         fields.put("phoneNumberVerified", verified);
         return updateFields(id, fields);
-    }
-
-    @Override
-    public RepoResponse updateGender(String id, Gender gender) {
-        return updateField(id, "gender", gender);
     }
 }

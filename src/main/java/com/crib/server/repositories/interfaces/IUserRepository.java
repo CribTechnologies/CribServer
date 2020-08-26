@@ -14,10 +14,9 @@ public interface IUserRepository extends IRepository<User> {
 
     RepoResponse setEmailVerifiedToTrue(String userId);
 
-    RepoResponse updateFirstAndLastName(String id, String firstName, String lastName);
     RepoResponse updateEmailAndVerified(String id, String email, boolean verified);
     RepoResponse updatePasswordHash(String id, String passwordHash);
-    RepoResponse updateDateOfBirth(String id, Date dateOfBirth);
     RepoResponse updatePhoneNumberAndVerified(String id, String phoneNumber, boolean verified);
-    RepoResponse updateGender(String id, Gender gender);
+
+    RepoResponse updateDetails(String id, String firstName, String lastName, Date dateOfBirth, Gender gender);
 }

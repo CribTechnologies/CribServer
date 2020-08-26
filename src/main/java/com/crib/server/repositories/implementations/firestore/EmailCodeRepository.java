@@ -1,7 +1,6 @@
 package com.crib.server.repositories.implementations.firestore;
 
 import com.crib.server.common.entities.EmailCode;
-import com.crib.server.common.entities.User;
 import com.crib.server.common.patterns.RepoResponseWP;
 import com.crib.server.repositories.FirestoreRepository;
 import com.crib.server.repositories.interfaces.IEmailCodeRepository;

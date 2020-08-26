@@ -20,23 +20,24 @@ import com.crib.server.repositories.RepositoryFactory;
 import com.crib.server.repositories.interfaces.IEmailCodeRepository;
 import com.crib.server.repositories.interfaces.IUserRepository;
 import com.crib.server.services.helpers.EmailHelper;
+import com.crib.server.services.helpers.IdHelper;
 import com.crib.server.services.helpers.StringGeneratorHelper;
 import com.crib.server.services.helpers.ValidationHelper;
 
 import java.util.Date;
-import java.util.UUID;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class AuthService extends Service {
 
-    private IUserRepository userRepository;
-    private IEmailCodeRepository emailCodeRepository;
-    private EnvVariables envVariables;
-    private Argon2Setup argon2;
-    private JSONWebTokenSetup jwt;
-    private EmailHelper emailHelper;
+    private final IUserRepository userRepository;
+    private final IEmailCodeRepository emailCodeRepository;
+
+    private final EnvVariables envVariables;
+    private final Argon2Setup argon2;
+    private final JSONWebTokenSetup jwt;
+
+    private final EmailHelper emailHelper;
+    private final IdHelper idHelper;
 
     public AuthService() {
         RepositoryFactory repositoryFactory = RepositoryFactory.getInstance();
@@ -46,6 +47,7 @@ public class AuthService extends Service {
         argon2 = Argon2Setup.getInstance();
         jwt = JSONWebTokenSetup.getInstance();
         emailHelper = EmailHelper.getInstance();
+        idHelper = IdHelper.getInstance();
     }
 
     public SignInResponse signIn(SignInRequest request) {
@@ -102,13 +104,13 @@ public class AuthService extends Service {
         user.setEmailVerified(false);
         user.setPhoneNumberVerified(false);
 
-        user.setId(UUID.randomUUID().toString());
+        user.setId(idHelper.generateId());
         user.setTimestamp(new Date().getTime());
         user.setPasswordHash(argon2.createHash(request.getPassword()));
 
         // Generate email code
         EmailCode code = new EmailCode();
-        code.setId(UUID.randomUUID().toString());
+        code.setId(idHelper.generateId());
         code.setTimestamp(new Date().getTime());
         code.setUserId(user.getId());
 
@@ -168,7 +170,6 @@ public class AuthService extends Service {
         if (ValidationHelper.addValidationErrorsToResponse(request, response)) {
             return response;
         }
-
         RepoResponseWP<User> repoResponse = userRepository.getUserByEmail(request.getEmail());
         if (repoResponse.isSuccessful()) {
             response.setRegistered(repoResponse.getPayload() != null);
